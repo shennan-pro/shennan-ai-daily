@@ -54,7 +54,7 @@ BEIJING = timezone(timedelta(hours=8))
 # v1.2.0：①换用 SN_logo-2.png 新 logo；②副标题破折号改为两个字符宽横线；
 #         ③金色分割线拉长并与内容区对齐；④早中晚改为代码块样式并高亮当前时段；
 #         ⑤右上角增加最近一个月日报历史入口；⑥增加导出功能（PNG/HTML/Markdown/CSV/PDF）
-VERSION = "1.11.3"
+VERSION = "1.11.4"
 
 # 项目仓库地址（GitHub Pages 上线后生效；footer 的 LICENSE / 仓库地址 / README 链接依赖此值）
 REPO_URL = "https://github.com/shennanjaysn-cmyk/shennan-ai-daily"
@@ -93,28 +93,50 @@ def fetch_json(url):
         return json.loads(r.read().decode("utf-8"))
 
 
+def fetch_report(url):
+    """v1.11.4：AIHOT API v2 把日报包了一层 {schemaVersion, report}，这里解包为 report 本体。"""
+    data = fetch_json(url)
+    if isinstance(data, dict) and isinstance(data.get("report"), dict):
+        return data["report"]
+    return data
+
+
+def item_source(it):
+    """v1.11.4：API v2 字段重构 —— sourceName → source.name，sourceUrl → links.original。兼容 1.x 旧字段。"""
+    src = it.get("source")
+    if isinstance(src, dict):
+        name = src.get("name") or ""
+    elif isinstance(src, str):
+        name = src
+    else:
+        name = it.get("sourceName") or ""
+    links = it.get("links")
+    if isinstance(links, dict):
+        url = links.get("original") or links.get("aihot") or ""
+    else:
+        url = it.get("sourceUrl") or ""
+    return (name.strip() or "来源"), (url or "#")
+
+
 def load_daily(target_date=None):
-    """Fetch a specific date briefing, or today's; fallback to latest archive on 404."""
+    """Fetch a specific date briefing, or the latest one.
+
+    v1.11.4：AIHOT API v2 (/api/v1)。`/api/v1/dailies/latest` 永远返回最近一期，
+    所以原先"今日 404 → 查归档 → 再取该日"的三级 fallback 可以整体删掉。
+    """
     if target_date:
         try:
-            return fetch_json(f"{AIHOT_BASE}/api/public/daily/{target_date}")
+            return fetch_report(f"{AIHOT_BASE}/api/v1/dailies/{target_date}")
         except urllib.error.HTTPError as e:
             if e.code != 404:
                 raise
-    try:
-        return fetch_json(AIHOT_BASE + "/api/public/daily")
-    except urllib.error.HTTPError as e:
-        if e.code == 404:
-            arch = fetch_json(AIHOT_BASE + "/api/public/dailies?take=1")
-            latest = arch["items"][0]["date"]
-            return fetch_json(f"{AIHOT_BASE}/api/public/daily/{latest}")
-        raise
+    return fetch_report(AIHOT_BASE + "/api/v1/dailies/latest")
 
 
 def load_history_dates(take=30):
     """Return list of YYYY-MM-DD strings for the most recent `take` days."""
     try:
-        data = fetch_json(f"{AIHOT_BASE}/api/public/dailies?take={take}")
+        data = fetch_json(f"{AIHOT_BASE}/api/v1/dailies?limit={take}")
         return [it["date"] for it in data.get("items", []) if it.get("date")]
     except Exception as e:
         print(f"WARNING: failed to load history dates: {e}")
@@ -192,8 +214,8 @@ def parse_data(data):
                 summary_raw = summary_raw[:279] + "…"
             title_esc = html.escape(title_raw)
             summary_esc = html.escape(summary_raw)
-            source_esc = html.escape(it.get("sourceName") or "来源")
-            url = it.get("sourceUrl") or "#"
+            src_name, url = item_source(it)
+            source_esc = html.escape(src_name)
             items.append({
                 "num": total,
                 "title": title_esc,
@@ -206,7 +228,7 @@ def parse_data(data):
                 "section": display_label,
                 "title": title_raw,
                 "summary": summary_raw,
-                "source": it.get("sourceName") or "来源",
+                "source": src_name,
                 "url": url,
             })
         cards_by_section.append({

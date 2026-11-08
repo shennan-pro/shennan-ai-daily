@@ -12,6 +12,58 @@
 
 ---
 
+## v1.11.4_261105 — 适配 AIHOT API v2（修线上日报停更 5 天）
+
+**类型**：修订版本（上游接口变更导致的生产故障修复）
+**日期**：2026-11-05
+
+### 一、故障现象
+- 线上首页日期停在 **2026年10月31日 周六**，`releases/daily/` 最新归档停在 `2026-10-30`。
+- GitHub Actions 的 schedule 任务（北京 08:10 / 12:10 / 18:10）自 **11-01 起连续 16 次全部 failure**，每次 12~38 秒即退出，`Deploy releases/ to gh-pages` 步骤从未执行 → gh-pages 分支内容一直停在 10-31 那一版。
+
+### 二、根因
+AIHOT 上游在 **2026-10-31（北京时间）** 完成 v2.0 迁移，生成器用的旧端点全部下线：
+
+| 旧端点（已 404） | 新端点 |
+|---|---|
+| `/api/public/daily` | `/api/v1/dailies/latest` |
+| `/api/public/daily/{date}` | `/api/v1/dailies/{date}` |
+| `/api/public/dailies?take=N` | `/api/v1/dailies?limit=N` |
+
+旧域 `aihot.virxact.com` 按官方 OpenAPI 说明只做 301 跳到新域同名路径 —— 而**路径本身已废弃**，所以换域名也救不回来，必须换路径。
+
+同时 **item 字段做了重构**（这是比路径更容易漏的一层）：
+
+| 旧字段 | 新字段 |
+|---|---|
+| `sourceName` | `source.name` |
+| `sourceUrl` | `links.original`（次选 `links.aihot`） |
+
+`title` / `summary` / `date` / `generatedAt` / `windowStart` / `windowEnd` / `sections[].label` / `sections[].items` 保持原样。
+
+### 三、修法
+1. 新增 `fetch_report()`：API v2 把日报包了一层 `{schemaVersion, report}`，统一在此解包，`parse_data()` 侧零改动。
+2. 新增 `item_source(it)`：按新字段取来源名与原文链接，**同时保留 1.x 旧字段兜底**（`sourceName` / `sourceUrl`），避免上游回滚或缓存混用时报错。
+3. `load_daily()` 简化：`/api/v1/dailies/latest` 永远返回最近一期，原先"今日 404 → 查归档 → 再取该日"的三级 fallback 链整体删除。
+4. `load_history_dates()` 换新端点与 `limit` 参数。
+
+### 四、验收
+- `python generate_dashboard.py` 一次跑通：**12 条 / 5 板块**（模型 3 / 产品 1 / 动态 2 / 研究 3 / 观点 3）。
+- 首页渲染 `2026年11月5日 周四`，12 张卡片、12 个来源 chip（`.chip` 全部有值，无「来源」兜底），链接 12/12 为原文直链（无 `#`）。
+- **补齐 11-01 ~ 11-04 四天缺失日报**（5 / 3 / 6 / 10 条），共重生成 30 天归档。
+- 周报 60 张卡片、月报 238 张卡片，聚合正常。
+- Chrome headless 渲染：**0 个 JS 错误**。
+
+### 五、上云（2026-11-09）
+- 本次才真正推送：`main` ← `fix_light_02`（此前修复只存在本地，线上一直跑旧代码，所以 cron 每天照旧 404）。
+- 顺带升级 CI：`actions/checkout@v4 → @v5`、`actions/setup-python@v5 → @v6`，清掉 `Node.js 20 is deprecated` 告警。
+- `peaceiris/actions-gh-pages@v4` 未动（该 action 不受 Node 20 弃用影响）。
+
+### 六、备注
+- 仓库所属账号已从 `shennanjaysn-cmyk` 改为 `shennan-pro`，线上地址随之变为 `https://shennan-pro.github.io/shennan-ai-daily/`（旧地址 404）。`origin` 已同步更新。
+
+---
+
 ## v1.11.3_260915 — 报告页 hero 归位 + 提示气泡越界归零 + 引用块文案压缩（fix_light_02）
 
 **类型**：修订版本（仅修复 bug / 细节优化）
