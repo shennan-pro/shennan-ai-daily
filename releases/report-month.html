@@ -1490,6 +1490,31 @@
     background: rgba(255, 255, 255, 0.42);
     box-shadow: 0 6px 18px -8px rgba(46, 58, 124, 0.18);
   }
+  /* v1.12.1：有新内容时的轻提示胶囊。只在用户停留前台时出现，不遮挡内容、不打断滚动 */
+  .update-pill {
+    position: fixed;
+    left: 50%;
+    bottom: calc(26px + env(safe-area-inset-bottom, 0px));
+    transform: translate(-50%, 10px);
+    z-index: 300;
+    padding: 9px 18px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-family: var(--font-base);
+    font-size: 12.5px;
+    letter-spacing: 0.04em;
+    color: var(--text-primary);
+    background: var(--surface-modal);
+    border: 1px solid var(--line-gold);
+    box-shadow: 0 12px 34px -12px rgba(0, 0, 0, .6);
+    white-space: nowrap;
+    max-width: calc(100vw - 32px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .3s ease, transform .3s cubic-bezier(.34, 1.2, .64, 1);
+  }
+  .update-pill.in { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+  .update-pill:hover { border-color: var(--brand-brief); }
   /* v1.11.1：hover 态只在真正有指针的设备生效。
    * 触屏浏览器会在按下后把 :hover 粘住 → 点了"上/下"按钮，高亮一直不散。
    * 收进 @media (hover: hover) 后，触屏根本没有 hover 态，只剩 :active 的即时反馈。 */
@@ -3906,22 +3931,15 @@
     if (topBtn) topBtn.addEventListener('click', () => window.scrollTo({top: 0, behavior: 'smooth'}));
     if (bottomBtn) bottomBtn.addEventListener('click', () => window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'}));
 
-    // 每到整点重新检测时段；若日期/时段变化则刷新页面以获取新数据
+    // v1.12.1：这里只负责「时段 → 主题」的自动切换，不再做任何 reload。
+    // （原实现每分钟判断日期是否变化，跨天后会每分钟硬刷一次，读者正在看就白闪一下）
     setInterval(() => {
       const beijing = nowInBeijing();
       const period = getPeriod(beijing.getHours());
-      const pagePeriod = body.dataset.pagePeriod || initialPeriod;
-      const pageDate = body.dataset.pageDate || '';
-      const todayStr = [beijing.getFullYear(), String(beijing.getMonth()+1).padStart(2,'0'), String(beijing.getDate()).padStart(2,'0')].join('-');
-      if (period !== pagePeriod || todayStr !== pageDate) {
-        // 仅在接近更新时刻（08:10, 12:30, 18:30）或日期变化时自动刷新
-        const m = beijing.getHours() * 60 + beijing.getMinutes();
-        const nearUpdate = (m >= 490 && m <= 495) || (m >= 750 && m <= 755) || (m >= 1110 && m <= 1115) || todayStr !== pageDate;
-        if (nearUpdate) window.location.reload();
-      }
       if (!window.__snUserOverrode) applyTheme(periodTheme(period));
     }, 60000);
   })();
+
 
   // Contact modal -> GitHub Issue（不暴露真实邮箱，GitHub 登录天然过滤垃圾）
   (function () {

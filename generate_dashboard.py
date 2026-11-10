@@ -54,7 +54,7 @@ BEIJING = timezone(timedelta(hours=8))
 # v1.2.0：①换用 SN_logo-2.png 新 logo；②副标题破折号改为两个字符宽横线；
 #         ③金色分割线拉长并与内容区对齐；④早中晚改为代码块样式并高亮当前时段；
 #         ⑤右上角增加最近一个月日报历史入口；⑥增加导出功能（PNG/HTML/Markdown/CSV/PDF）
-VERSION = "1.12.0"
+VERSION = "1.12.1"
 
 # 项目仓库地址（GitHub Pages 上线后生效；footer 的 LICENSE / 仓库地址 / README 链接依赖此值）
 REPO_URL = "https://github.com/shennan-pro/shennan-ai-daily"
@@ -475,7 +475,9 @@ def render_html(info, page_info):
         body_attrs = f'data-page-report="{report_range}"'
     else:
         title = f"深南AI日报 Daily AI Brief · {date_str}"
-        body_attrs = f'data-page-period="{period_key}" data-page-date="{date_str}"'
+        # v1.12.1：首页记下内容指纹，供 version.json 比对；不再靠"日期变了"猜更新
+        _gen_attr = f' data-gen="{gen_dt.isoformat()}"' if is_index else ''
+        body_attrs = f'data-page-period="{period_key}" data-page-date="{date_str}"{_gen_attr}'
 
     # [v1.11.2] 导出下拉：主页/历史页给「今天 / 近一周 / 近一月」三范围；
     # 报告页直接导出当前这份周报/月报（"导出范围：今天"放在周报页是错位的，故只留格式列表）。
@@ -646,6 +648,48 @@ def render_html(info, page_info):
     else:
         footer_meta_html = (f'本期共 <span class="num">{total}</span> 条 · '
                             f'{len(cards_by_section)} 个版块 · {date_str}')
+
+    # v1.12.1：内容更新检测脚本（仅首页注入）。
+    # 旧实现每 60 秒调一次 location.reload()，且跨天后 pageDate 与"今天"不符就无条件刷 ——
+    # 读者可能从凌晨到早上 8 点被每分钟刷一次。新策略：轮询几百字节的 version.json，
+    # 比对内容指纹；只有标签页在后台时才允许硬刷（用户看不见），前台只挂一条胶囊，绝不打断阅读。
+    update_poll_js = ""
+    if is_index:
+        update_poll_js = """
+  // ===== 内容更新检测（v1.12.1）=====
+  (function () {
+    var VGEN = document.body.dataset.gen || '';
+    var pending = false, pill = null;
+    function showPill() {
+      if (pill) return;
+      pill = document.createElement('button');
+      pill.type = 'button';
+      pill.className = 'update-pill';
+      pill.textContent = '有新内容 · 点击更新';
+      pill.addEventListener('click', function () { location.reload(); });
+      document.body.appendChild(pill);
+      void pill.offsetWidth;   // 强制 reflow，给 transition 一个起点（不依赖 rAF）
+      pill.classList.add('in');
+    }
+    function poll() {
+      if (location.protocol === 'file:' || !VGEN) return;
+      fetch('version.json?_=' + Date.now(), { cache: 'no-store' })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (v) {
+          if (!v || !v.gen || v.gen === VGEN) return;
+          pending = true;
+          if (document.visibilityState === 'hidden') location.reload();
+          else showPill();
+        })
+        .catch(function () {});
+    }
+    setInterval(poll, 180000);
+    setTimeout(poll, 15000);
+    document.addEventListener('visibilitychange', function () {
+      if (document.visibilityState === 'hidden' && pending) location.reload();
+    });
+  })();
+"""
 
     return f"""<!DOCTYPE html>
 <html lang="zh-CN">
@@ -2090,6 +2134,31 @@ def render_html(info, page_info):
     background: rgba(255, 255, 255, 0.42);
     box-shadow: 0 6px 18px -8px rgba(46, 58, 124, 0.18);
   }}
+  /* v1.12.1：有新内容时的轻提示胶囊。只在用户停留前台时出现，不遮挡内容、不打断滚动 */
+  .update-pill {{
+    position: fixed;
+    left: 50%;
+    bottom: calc(26px + env(safe-area-inset-bottom, 0px));
+    transform: translate(-50%, 10px);
+    z-index: 300;
+    padding: 9px 18px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-family: var(--font-base);
+    font-size: 12.5px;
+    letter-spacing: 0.04em;
+    color: var(--text-primary);
+    background: var(--surface-modal);
+    border: 1px solid var(--line-gold);
+    box-shadow: 0 12px 34px -12px rgba(0, 0, 0, .6);
+    white-space: nowrap;
+    max-width: calc(100vw - 32px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .3s ease, transform .3s cubic-bezier(.34, 1.2, .64, 1);
+  }}
+  .update-pill.in {{ opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }}
+  .update-pill:hover {{ border-color: var(--brand-brief); }}
   /* v1.11.1：hover 态只在真正有指针的设备生效。
    * 触屏浏览器会在按下后把 :hover 粘住 → 点了"上/下"按钮，高亮一直不散。
    * 收进 @media (hover: hover) 后，触屏根本没有 hover 态，只剩 :active 的即时反馈。 */
@@ -2724,22 +2793,15 @@ def render_html(info, page_info):
     if (topBtn) topBtn.addEventListener('click', () => window.scrollTo({{top: 0, behavior: 'smooth'}}));
     if (bottomBtn) bottomBtn.addEventListener('click', () => window.scrollTo({{top: document.body.scrollHeight, behavior: 'smooth'}}));
 
-    // 每到整点重新检测时段；若日期/时段变化则刷新页面以获取新数据
+    // v1.12.1：这里只负责「时段 → 主题」的自动切换，不再做任何 reload。
+    // （原实现每分钟判断日期是否变化，跨天后会每分钟硬刷一次，读者正在看就白闪一下）
     setInterval(() => {{
       const beijing = nowInBeijing();
       const period = getPeriod(beijing.getHours());
-      const pagePeriod = body.dataset.pagePeriod || initialPeriod;
-      const pageDate = body.dataset.pageDate || '';
-      const todayStr = [beijing.getFullYear(), String(beijing.getMonth()+1).padStart(2,'0'), String(beijing.getDate()).padStart(2,'0')].join('-');
-      if (period !== pagePeriod || todayStr !== pageDate) {{
-        // 仅在接近更新时刻（08:10, 12:30, 18:30）或日期变化时自动刷新
-        const m = beijing.getHours() * 60 + beijing.getMinutes();
-        const nearUpdate = (m >= 490 && m <= 495) || (m >= 750 && m <= 755) || (m >= 1110 && m <= 1115) || todayStr !== pageDate;
-        if (nearUpdate) window.location.reload();
-      }}
       if (!window.__snUserOverrode) applyTheme(periodTheme(period));
     }}, 60000);
   }})();
+{update_poll_js}
 
   // Contact modal -> GitHub Issue（不暴露真实邮箱，GitHub 登录天然过滤垃圾）
   (function () {{
@@ -3445,6 +3507,17 @@ def main():
     exports_js_content = f"/* Auto-generated by generate_dashboard.py */\nwindow.SN_EXPORT = {{\n{',\n'.join(scope_js_parts)}\n}};\n"
     (RELEASES / "exports.js").write_text(exports_js_content, encoding="utf-8")
     print(f"OK -> exports.js ({len(exports_js_content)} bytes)")
+
+    # v1.12.1：内容指纹文件（几百字节）。首页轮询它判断"要不要更新"，避免为了探测而拉 190KB 整页。
+    # gen 与首页 body[data-gen] 同源，相等即代表页面内容没有变化。
+    (RELEASES / "version.json").write_text(json.dumps({
+        "version": VERSION,
+        "date": latest_info["date_str"],
+        "gen": latest_info["gen_dt"].isoformat(),
+        "count": latest_info["total"],
+        "built": datetime.now(BEIJING).isoformat(timespec="seconds"),
+    }, ensure_ascii=False, indent=2), encoding="utf-8")
+    print("OK -> version.json")
 
     # Generate daily pages for all available dates (skip existing to save time)
     # _fix_vision_011：加 --force-daily 显式标志，CSS/HTML 改动需要重生成所有 daily 时用（默认仍跳过）
