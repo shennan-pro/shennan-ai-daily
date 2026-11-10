@@ -794,6 +794,12 @@
     border-radius: 0 8px 8px 0;
   }
   .hero-lead .lead-strong { color: var(--mist-body); }
+  /* v1.11.5：报告页版块分布条（单色明度阶梯，跟正文的克制基调一致） */
+  .dist { margin-top: 22px; }
+  .dist-bar { display: flex; height: 6px; border-radius: 3px; overflow: hidden; background: var(--line-faint); }
+  .dist-seg { height: 100%; background: var(--brand-brief); transition: opacity .2s ease; }
+  .dist-seg:hover { opacity: 1 !important; }
+  .dist-cap { margin-top: 9px; font-size: 11px; color: var(--mist-faint); letter-spacing: 0.08em; }
   .hero-tip {
     display: inline-flex;
     align-items: center;
@@ -1134,6 +1140,15 @@
 
   .card-num { font-family: var(--font-num); font-weight: 300; font-size: 32px; color: var(--gold); line-height: 1; margin-bottom: 16px; letter-spacing: -0.02em; }
   .card-body { flex: 1; display: flex; flex-direction: column; gap: 12px; }
+  /* v1.11.5：日期标签 + 来源标签同一行（仅周报/月报出现日期） */
+  .card-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .chip.chip-date {
+    color: var(--brand-brief);
+    border-color: var(--line-gold);
+    background: transparent;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.06em;
+  }
   .chip {
     display: inline-block;
     align-self: flex-start;
@@ -1779,6 +1794,7 @@
         </div>
       </div>
     </div>
+    
   </header>
 </div>
 
@@ -1813,7 +1829,9 @@
       历史日报
     </button>
     <div class="dropdown-menu" role="menu">
-      <a class="dropdown-item" href="./2026-11-08.html">2026-11-08</a>
+      <a class="dropdown-item" href="./2026-11-10.html">2026-11-10</a>
+<a class="dropdown-item" href="./2026-11-09.html">2026-11-09</a>
+<a class="dropdown-item" href="./2026-11-08.html">2026-11-08</a>
 <a class="dropdown-item" href="./2026-11-07.html">2026-11-07</a>
 <a class="dropdown-item" href="./2026-11-06.html">2026-11-06</a>
 <a class="dropdown-item" href="./2026-11-05.html">2026-11-05</a>
@@ -1840,8 +1858,6 @@
 <a class="dropdown-item" href="./2026-10-14.html">2026-10-14</a>
 <a class="dropdown-item" href="./2026-10-13.html">2026-10-13</a>
 <a class="dropdown-item" href="./2026-10-12.html">2026-10-12</a>
-<a class="dropdown-item" href="./2026-10-11.html">2026-10-11</a>
-<a class="dropdown-item" href="./2026-10-10.html">2026-10-10</a>
     </div>
   </div>
   <div class="dropdown" id="exportDropdown">
@@ -1881,7 +1897,7 @@
 <a class="card" href="https://www.inceptionlabs.ai/blog/introducing-mercury-3" target="_blank" rel="noopener noreferrer" style="--d:0">
   <div class="card-num">01</div>
   <div class="card-body">
-    <span class="chip">Inception Labs：Blog（网页）</span>
+    <div class="card-meta"><span class="chip">Inception Labs：Blog（网页）</span></div>
     <h3 class="card-title">Inception Labs 发布扩散大语言模型 Mercury 3，速度达 1068 tokens/秒</h3>
     <p class="card-summary">Inception Labs 发布扩散式大语言模型 Mercury 3，称其在多项基准上超过 GPT-6 Luna 和 Claude Haiku 5.5，速度达 1068 tokens/秒，参数量较 Mercury 1 扩大 40 倍以上。</p>
   </div>
@@ -1900,7 +1916,7 @@
 <a class="card" href="https://mp.weixin.qq.com/s?__biz=Mzk0OTYwNzc3NQ%3D%3D&mid=2247485884&idx=1&sn=d457981abe7db1f1b5d600fc109dc836" target="_blank" rel="noopener noreferrer" style="--d:0">
   <div class="card-num">02</div>
   <div class="card-body">
-    <span class="chip">公众号：DeepSeek（深度求索）</span>
+    <div class="card-meta"><span class="chip">公众号：DeepSeek（深度求索）</span></div>
     <h3 class="card-title">DeepSeek 全面开源内部推理框架 DeepInfer</h3>
     <p class="card-summary">DeepSeek 宣布将内部推理框架 DeepInfer 全面开源，并同步开源生产级 Token 编解码组件 deepseek-recipe。</p>
   </div>
@@ -1909,7 +1925,7 @@
 <a class="card" href="https://pytorch.org/blog/introducing-torchtpu/" target="_blank" rel="noopener noreferrer" style="--d:1">
   <div class="card-num">03</div>
   <div class="card-body">
-    <span class="chip">PyTorch：Blog（RSS）</span>
+    <div class="card-meta"><span class="chip">PyTorch：Blog（RSS）</span></div>
     <h3 class="card-title">Google 与 Meta 发布 TorchTPU：PyTorch 原生 TPU 后端</h3>
     <p class="card-summary">Google 与 Meta 发布开源项目 TorchTPU，为 Google TPU 提供原生 PyTorch 后端，模型迁移只需把 .to(&quot;cuda&quot;) 改为 .to(&quot;tpu&quot;)。</p>
   </div>
@@ -1918,7 +1934,7 @@
 <a class="card" href="https://x.com/ChatGPT/status/2112597766333673624" target="_blank" rel="noopener noreferrer" style="--d:2">
   <div class="card-num">04</div>
   <div class="card-body">
-    <span class="chip">X：ChatGPT (@ChatGPT)</span>
+    <div class="card-meta"><span class="chip">X：ChatGPT (@ChatGPT)</span></div>
     <h3 class="card-title">ChatGPT 推出 Locked Chats，可用 PIN 或生物识别锁定敏感对话</h3>
     <p class="card-summary">ChatGPT 推出 Locked Chats 功能，把敏感对话从常规历史记录和搜索中移入受保护空间。用户在网页端和桌面端可用 PIN 解锁，支持的移动设备上可用 PIN、Face ID、Touch ID 或设备解锁；锁定会话中的新消息不会更新常规对话使用的记忆。该功能即日起向 Free、Go、Plus、Pro、Business、Enterprise 和 Edu 套餐推出。</p>
   </div>
@@ -1927,7 +1943,7 @@
 <a class="card" href="https://developers.googleblog.com/announcing-new-vllm-and-sglang-inference-engines-on-tpu/" target="_blank" rel="noopener noreferrer" style="--d:3">
   <div class="card-num">05</div>
   <div class="card-body">
-    <span class="chip">Google Developers Blog（RSS）</span>
+    <div class="card-meta"><span class="chip">Google Developers Blog（RSS）</span></div>
     <h3 class="card-title">Google 发布 vLLM 与 SGLang 的 TorchTPU 原生推理引擎</h3>
     <p class="card-summary">Google 在 PyTorch 相关公告中推出基于 TorchTPU 的 vLLM 和 SGLang 原生 PyTorch 推理引擎，分别与 Inferact、RadixArk 合作开发，让开发者用熟悉的 PyTorch 工具在 TPU 上部署模型。</p>
   </div>
@@ -1946,7 +1962,7 @@
 <a class="card" href="https://x.com/rohanpaul_ai/status/2112455383356989598" target="_blank" rel="noopener noreferrer" style="--d:0">
   <div class="card-num">06</div>
   <div class="card-body">
-    <span class="chip">X：Rohan Paul (@rohanpaul_ai)</span>
+    <div class="card-meta"><span class="chip">X：Rohan Paul (@rohanpaul_ai)</span></div>
     <h3 class="card-title">路透：OpenAI 拟在 Anthropic 上市前加速融资约 300 亿美元，估值超 1.4 万亿美元</h3>
     <p class="card-summary">据 Reuters 报道，OpenAI 正赶在 Anthropic 上市前洽谈融资约 300 亿美元，估值超 1.4 万亿美元，比 3 月的 8520 亿美元至少高 64%。</p>
   </div>
@@ -1955,7 +1971,7 @@
 <a class="card" href="https://techcrunch.com/2026/10/20/spacexs-ai-business-is-beating-expectations/" target="_blank" rel="noopener noreferrer" style="--d:1">
   <div class="card-num">07</div>
   <div class="card-body">
-    <span class="chip">TechCrunch：AI（RSS）</span>
+    <div class="card-meta"><span class="chip">TechCrunch：AI（RSS）</span></div>
     <h3 class="card-title">SpaceX 财报显示 AI 业务超预期，占收入 52%</h3>
     <p class="card-summary">SpaceX 发布第三季度监管文件，披露营收 146 亿美元、净利润 44 亿美元，扭转去年同期 10 亿美元亏损。其更名的“Super Intelligence”业务线（含 Cursor、Grok 和 neocloud 算力业务）表现好于投资者预期，AI 目前占公司收入 52%，算力规模达 1.7 GW。</p>
   </div>
@@ -1964,7 +1980,7 @@
 <a class="card" href="https://the-decoder.com/army-cyber-commands-echotribble-would-turn-ai-agents-into-self-spreading-cyberweapons/" target="_blank" rel="noopener noreferrer" style="--d:2">
   <div class="card-num">08</div>
   <div class="card-body">
-    <span class="chip">The Decoder：AI News（RSS）</span>
+    <div class="card-meta"><span class="chip">The Decoder：AI News（RSS）</span></div>
     <h3 class="card-title">美国陆军网络司令部 ECHOTRIBBLE 项目拟将 AI 智能体变成自主扩散的网络武器</h3>
     <p class="card-summary">据 The Intercept 获取的文件，美国陆军网络司令部（ARCYBER）正在开发代号 ECHOTRIBBLE 的平台，让 AI 智能体自主在网络间移动、识别并清除威胁目标，之后自毁，且须在极少人工监督下运行。</p>
   </div>
@@ -1973,7 +1989,7 @@
 <a class="card" href="https://redact.dev/blog/whatsapp-help-pages-hidden-ai-instructions" target="_blank" rel="noopener noreferrer" style="--d:3">
   <div class="card-num">09</div>
   <div class="card-body">
-    <span class="chip">Hacker News：AI 热帖</span>
+    <div class="card-meta"><span class="chip">Hacker News：AI 热帖</span></div>
     <h3 class="card-title">Redact 调查：WhatsApp 帮助页面隐藏 LLM 指令，让 AI 不推荐监管机构、不提 GDPR</h3>
     <p class="card-summary">Redact 发现 WhatsApp 帮助中心页面向 LLM 发送用户看不到的隐藏指令，指示其支持聊天机器人不推荐数据保护监管机构，并在用户提到律师或法律行动后不引用 GDPR、LGPD 或 CCPA。</p>
   </div>
@@ -1982,7 +1998,7 @@
 <a class="card" href="https://openai.com/index/openai-to-acquire-orchestra-bio" target="_blank" rel="noopener noreferrer" style="--d:4">
   <div class="card-num">10</div>
   <div class="card-body">
-    <span class="chip">OpenAI：官网动态（RSS · 排除企业/客户案例）</span>
+    <div class="card-meta"><span class="chip">OpenAI：官网动态（RSS · 排除企业/客户案例）</span></div>
     <h3 class="card-title">OpenAI 收购药物研发平台 Orchestra Bio 并入 Rosalind 生命科学体系</h3>
     <p class="card-summary">OpenAI 宣布收购 Orchestra Bio，一个帮助生物制药团队协调药物研发复杂流程的平台，其团队和技术将与 Rosalind 整合。Orchestra 的智能体可帮助团队追踪研究和项目进展，分析如生产批次失败对临床试验时间线的影响并提出应对方案。文中还提到与 Novo Nordisk 和 Moderna 的合作，以及新药研发平均需要 10 到 15 年的背景。</p>
   </div>
@@ -1991,7 +2007,7 @@
 <a class="card" href="https://techcrunch.com/2026/10/20/anthropics-cloud-partnerships-are-getting-messy/" target="_blank" rel="noopener noreferrer" style="--d:5">
   <div class="card-num">11</div>
   <div class="card-body">
-    <span class="chip">TechCrunch：AI（RSS）</span>
+    <div class="card-meta"><span class="chip">TechCrunch：AI（RSS）</span></div>
     <h3 class="card-title">Anthropic 云合作生变：AWS、Google、微软视其为竞争者</h3>
     <p class="card-summary">据泄露给华尔街日报的 S-1 文件，Anthropic 难以从 AWS、Google 和 Microsoft 获得足够云算力，这些厂商日益将其视为竞争者而非客户。</p>
   </div>
@@ -2010,7 +2026,7 @@
 <a class="card" href="https://www.anthropic.com/research/claude-scorpion-toxin-binder-design" target="_blank" rel="noopener noreferrer" style="--d:0">
   <div class="card-num">12</div>
   <div class="card-body">
-    <span class="chip">Anthropic：Research（发表成果 · 网页）</span>
+    <div class="card-meta"><span class="chip">Anthropic：Research（发表成果 · 网页）</span></div>
     <h3 class="card-title">Anthropic 用 Claude 设计出针对蝎子神经毒素的蛋白质迷你结合剂</h3>
     <p class="card-summary">Anthropic 让内部研究模型在 Claude Science 中主要自主运行 64 小时，设计针对五种蝎子神经毒素的蛋白质迷你结合剂，共生成 318,484 个设计、筛选出 180 个。</p>
   </div>
@@ -2043,7 +2059,7 @@
         <a href="../report.html"><svg class="doc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>聚合报告</a>
         <a href="../license.html"><svg class="doc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 4-1.34 4-4V3"/><path d="M21 7h-2c-2 0 4-1.34 4-4V3"/></svg>LICENSE</a>
         <a href="../disclaimer.html"><svg class="doc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>免责声明</a>
-        <a href="https://github.com/shennanjaysn-cmyk/shennan-ai-daily" target="_blank" rel="noopener noreferrer"><svg class="doc-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.419-1.305.762-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>仓库地址</a>
+        <a href="https://github.com/shennan-pro/shennan-ai-daily" target="_blank" rel="noopener noreferrer"><svg class="doc-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.419-1.305.762-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>仓库地址</a>
         <a href="../about.html"><svg class="doc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>关于项目</a>
       </nav>
     </div>
@@ -2366,7 +2382,7 @@
     var nameEl = document.getElementById('contactName');
     var msgEl = document.getElementById('contactMsg');
     var hp = document.getElementById('contactHp');
-    var REPO = 'https://github.com/shennanjaysn-cmyk/shennan-ai-daily';
+    var REPO = 'https://github.com/shennan-pro/shennan-ai-daily';
     if (!btn || !modal) return;
     function openM() { modal.classList.add('open'); modal.setAttribute('aria-hidden', 'false'); msgEl.focus(); }
     function shutM() { modal.classList.remove('open'); modal.setAttribute('aria-hidden', 'true'); }

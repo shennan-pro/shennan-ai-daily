@@ -794,6 +794,12 @@
     border-radius: 0 8px 8px 0;
   }
   .hero-lead .lead-strong { color: var(--mist-body); }
+  /* v1.11.5：报告页版块分布条（单色明度阶梯，跟正文的克制基调一致） */
+  .dist { margin-top: 22px; }
+  .dist-bar { display: flex; height: 6px; border-radius: 3px; overflow: hidden; background: var(--line-faint); }
+  .dist-seg { height: 100%; background: var(--brand-brief); transition: opacity .2s ease; }
+  .dist-seg:hover { opacity: 1 !important; }
+  .dist-cap { margin-top: 9px; font-size: 11px; color: var(--mist-faint); letter-spacing: 0.08em; }
   .hero-tip {
     display: inline-flex;
     align-items: center;
@@ -1134,6 +1140,15 @@
 
   .card-num { font-family: var(--font-num); font-weight: 300; font-size: 32px; color: var(--gold); line-height: 1; margin-bottom: 16px; letter-spacing: -0.02em; }
   .card-body { flex: 1; display: flex; flex-direction: column; gap: 12px; }
+  /* v1.11.5：日期标签 + 来源标签同一行（仅周报/月报出现日期） */
+  .card-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .chip.chip-date {
+    color: var(--brand-brief);
+    border-color: var(--line-gold);
+    background: transparent;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.06em;
+  }
   .chip {
     display: inline-block;
     align-self: flex-start;
@@ -1779,6 +1794,7 @@
         </div>
       </div>
     </div>
+    
   </header>
 </div>
 
@@ -1814,7 +1830,9 @@
       历史日报
     </button>
     <div class="dropdown-menu" role="menu">
-      <a class="dropdown-item" href="./2026-11-08.html">2026-11-08</a>
+      <a class="dropdown-item" href="./2026-11-10.html">2026-11-10</a>
+<a class="dropdown-item" href="./2026-11-09.html">2026-11-09</a>
+<a class="dropdown-item" href="./2026-11-08.html">2026-11-08</a>
 <a class="dropdown-item" href="./2026-11-07.html">2026-11-07</a>
 <a class="dropdown-item" href="./2026-11-06.html">2026-11-06</a>
 <a class="dropdown-item" href="./2026-11-05.html">2026-11-05</a>
@@ -1841,8 +1859,6 @@
 <a class="dropdown-item" href="./2026-10-14.html">2026-10-14</a>
 <a class="dropdown-item" href="./2026-10-13.html">2026-10-13</a>
 <a class="dropdown-item" href="./2026-10-12.html">2026-10-12</a>
-<a class="dropdown-item" href="./2026-10-11.html">2026-10-11</a>
-<a class="dropdown-item" href="./2026-10-10.html">2026-10-10</a>
     </div>
   </div>
   <div class="dropdown" id="exportDropdown">
@@ -1882,7 +1898,7 @@
 <a class="card" href="https://www.kimi.com/blog/kimi-k3-1-pro" target="_blank" rel="noopener noreferrer" style="--d:0">
   <div class="card-num">01</div>
   <div class="card-body">
-    <span class="chip">Moonshot AI：Kimi Blog</span>
+    <div class="card-meta"><span class="chip">Moonshot AI：Kimi Blog</span></div>
     <h3 class="card-title">月之暗面发布 Kimi K3.1 Pro，100 万 token 上下文，开放权重将于 11 月 4 日前释出</h3>
     <p class="card-summary">月之暗面发布 Kimi K3.1 系列首个模型 Kimi K3.1 Pro，为 3T 级开放权重模型，上下文窗口 100 万 token，并同步推出速度快 2-3 倍的 Kimi K3.1 Pro Highspeed。</p>
   </div>
@@ -1891,7 +1907,7 @@
 <a class="card" href="https://x.com/MiniMax_AI/status/2113436864904610008" target="_blank" rel="noopener noreferrer" style="--d:1">
   <div class="card-num">02</div>
   <div class="card-body">
-    <span class="chip">X：MiniMax (@MiniMax_AI)</span>
+    <div class="card-meta"><span class="chip">X：MiniMax (@MiniMax_AI)</span></div>
     <h3 class="card-title">MiniMax 开放 M3.1 Flash 权重：428B 总参数、每 token 激活 23B</h3>
     <p class="card-summary">MiniMax 宣布 M3.1 Flash 权重公开，总参数 428B、每 token 激活 23B，提供 Hugging Face 和 ModelScope 下载。</p>
   </div>
@@ -1910,7 +1926,7 @@
 <a class="card" href="https://x.com/fal/status/2113646807997620396" target="_blank" rel="noopener noreferrer" style="--d:0">
   <div class="card-num">03</div>
   <div class="card-body">
-    <span class="chip">X：fal (@fal)</span>
+    <div class="card-meta"><span class="chip">X：fal (@fal)</span></div>
     <h3 class="card-title">Kling 4.0 在 fal 上线并向所有客户开放 API 访问</h3>
     <p class="card-summary">fal 宣布 Kling 4.0 正式向公众开放，所有客户均可通过 API 访问。该模型支持最长 30 秒带音频的原生视频生成、最多 15 个图像/视频/元素参考、最多 10 个关键帧的精确控制，并提升了运动、角色一致性和电影感叙事表现。</p>
   </div>
@@ -1919,7 +1935,7 @@
 <a class="card" href="https://www.hesaitech.com/cn/news/1526" target="_blank" rel="noopener noreferrer" style="--d:1">
   <div class="card-num">04</div>
   <div class="card-body">
-    <span class="chip">禾赛科技</span>
+    <div class="card-meta"><span class="chip">禾赛科技</span></div>
     <h3 class="card-title">禾赛发布三维世界数据引擎 Kosmo 及 8K AI 空间相机 Kosmo One</h3>
     <p class="card-summary">10 月 14 日，禾赛科技正式发布三维世界数据引擎 Kosmo，同步推出集成 8K 影像系统的 AI 空间相机 Kosmo One 和云平台 Kosmo World，瞄准具身智能与世界模型的真实世界数据需求。</p>
   </div>
@@ -1938,7 +1954,7 @@
 <a class="card" href="https://openai.com/index/securing-our-frontier-model-training-environment" target="_blank" rel="noopener noreferrer" style="--d:0">
   <div class="card-num">05</div>
   <div class="card-body">
-    <span class="chip">OpenAI：官网动态（RSS · 排除企业/客户案例）</span>
+    <div class="card-meta"><span class="chip">OpenAI：官网动态（RSS · 排除企业/客户案例）</span></div>
     <h3 class="card-title">OpenAI 详解前沿模型训练环境的安全加固与红队测试</h3>
     <p class="card-summary">OpenAI 介绍其前沿模型训练与评估环境的安全加固措施，包括训练期间不接入互联网、构建离线缓存网页世界、以纵深防御多层隔离，并用最强模型（含即将推出的 GPT‑6 Astra Cyber）组成智能体团队进行高算力红队测试。</p>
   </div>
@@ -1947,7 +1963,7 @@
 <a class="card" href="https://www.apple.com/newsroom/2026/10/iphone-duo-arrives-at-apple-store-locations-worldwide/" target="_blank" rel="noopener noreferrer" style="--d:1">
   <div class="card-num">06</div>
   <div class="card-body">
-    <span class="chip">Apple：Newsroom（RSS）</span>
+    <div class="card-meta"><span class="chip">Apple：Newsroom（RSS）</span></div>
     <h3 class="card-title">iPhone Duo 全球 Apple Store 正式开售，首台可折叠 iPhone 上架</h3>
     <p class="card-summary">10 月 23 日，iPhone Duo 在全球 Apple Store 门店正式开售，顾客可现场体验首款可折叠 iPhone。</p>
   </div>
@@ -1956,7 +1972,7 @@
 <a class="card" href="https://www.ithome.com/1/017/113.htm" target="_blank" rel="noopener noreferrer" style="--d:2">
   <div class="card-num">07</div>
   <div class="card-body">
-    <span class="chip">IT之家·人工智能</span>
+    <div class="card-meta"><span class="chip">IT之家·人工智能</span></div>
     <h3 class="card-title">国务院办公厅印发意见：增强 AI 创造就业正面效应，减缓就业替代影响</h3>
     <p class="card-summary">国务院办公厅 10 月 23 日印发《关于适应人工智能技术发展助力构建就业友好型发展方式的意见》，提出增强 AI 创造就业机会、赋能传统岗位的正面效应，有效减缓 AI 应用的就业替代影响。</p>
   </div>
@@ -1965,7 +1981,7 @@
 <a class="card" href="https://latent.space/p/ainews-openais-patch-the-planet-program/" target="_blank" rel="noopener noreferrer" style="--d:3">
   <div class="card-num">08</div>
   <div class="card-body">
-    <span class="chip">Latent Space（RSS）</span>
+    <div class="card-meta"><span class="chip">Latent Space（RSS）</span></div>
     <h3 class="card-title">Latent Space 梳理 PHP2Shell 漏洞事件：OpenAI Patch the Planet 与 Wiz 各自发现 PHP 核心漏洞</h3>
     <p class="card-summary">Latent Space 的 AINews 汇总梳理了 PHP 核心漏洞 PHP2Shell（CVE-2026-109618、CVE-2026-109619）的披露时间线，研究者在 PHP 引擎的内存溢出和致命错误处理中发现缺陷，演示了对 WordPress、Drupal、Joomla 的预认证 RCE 和远程内存泄露。</p>
   </div>
@@ -1974,7 +1990,7 @@
 <a class="card" href="https://x.com/rohanpaul_ai/status/2113511968112042349" target="_blank" rel="noopener noreferrer" style="--d:4">
   <div class="card-num">09</div>
   <div class="card-body">
-    <span class="chip">X：Rohan Paul (@rohanpaul_ai)</span>
+    <div class="card-meta"><span class="chip">X：Rohan Paul (@rohanpaul_ai)</span></div>
     <h3 class="card-title">WSJ：OpenAI 因 Signal 阅后即焚聊天解雇 3 名安全研究员</h3>
     <p class="card-summary">据 WSJ 报道，OpenAI 安全人员发现 3 名安全研究员与一名外部安全研究员使用阅后即焚的 Signal 聊天后将其解雇。</p>
   </div>
@@ -1993,7 +2009,7 @@
 <a class="card" href="https://www.anthropic.com/research/alignment-assessment-ukaisi" target="_blank" rel="noopener noreferrer" style="--d:0">
   <div class="card-num">10</div>
   <div class="card-body">
-    <span class="chip">Anthropic：Research（发表成果 · 网页）</span>
+    <div class="card-meta"><span class="chip">Anthropic：Research（发表成果 · 网页）</span></div>
     <h3 class="card-title">Anthropic 分析 Claude Mythos 5 在 UK AISI CTF 测试中的对齐失当行为</h3>
     <p class="card-summary">Anthropic 发布对 Claude Mythos 5 对齐问题的评估报告。</p>
   </div>
@@ -2002,7 +2018,7 @@
 <a class="card" href="https://claude.com/blog/claude-duet-safety-privacy-and-security" target="_blank" rel="noopener noreferrer" style="--d:1">
   <div class="card-num">11</div>
   <div class="card-body">
-    <span class="chip">Claude：Blog（网页）</span>
+    <div class="card-meta"><span class="chip">Claude：Blog（网页）</span></div>
     <h3 class="card-title">Anthropic 介绍 Claude Duet 智能体的安全、隐私与凭证隔离设计</h3>
     <p class="card-summary">Anthropic 发文介绍处于研究预览阶段的 Claude Duet 智能体的安全与隐私设计。重要操作如发消息、付款、删除需用户在审批卡上确认，独立于模型之外的分类器检查操作是否符合意图；密码、cookie 和登录令牌不经过模型，支付使用一次性虚拟卡；敏感信息分为绝不共享和需同意共享两级，由独立分类器在发送前检查。</p>
   </div>
@@ -2021,7 +2037,7 @@
 <a class="card" href="https://x.com/alexeheath/status/2113706585348600220" target="_blank" rel="noopener noreferrer" style="--d:0">
   <div class="card-num">12</div>
   <div class="card-body">
-    <span class="chip">X：Alex Heath (@alexeheath)</span>
+    <div class="card-meta"><span class="chip">X：Alex Heath (@alexeheath)</span></div>
     <h3 class="card-title">Sundar Pichai 解释 Demis Hassabis 退出 DeepMind 日常管理与 Jeff Dean 离职</h3>
     <p class="card-summary">Sundar Pichai 在访谈中解释 Demis Hassabis 逐步退出 DeepMind 日常管理和 Jeff Dean 离开 Google 的原因，称前沿模型开发已成为一项从数据、算力到团队管理都全消耗的规模化工作。</p>
   </div>
@@ -2054,7 +2070,7 @@
         <a href="../report.html"><svg class="doc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>聚合报告</a>
         <a href="../license.html"><svg class="doc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 4-1.34 4-4V3"/><path d="M21 7h-2c-2 0 4-1.34 4-4V3"/></svg>LICENSE</a>
         <a href="../disclaimer.html"><svg class="doc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>免责声明</a>
-        <a href="https://github.com/shennanjaysn-cmyk/shennan-ai-daily" target="_blank" rel="noopener noreferrer"><svg class="doc-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.419-1.305.762-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>仓库地址</a>
+        <a href="https://github.com/shennan-pro/shennan-ai-daily" target="_blank" rel="noopener noreferrer"><svg class="doc-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.419-1.305.762-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>仓库地址</a>
         <a href="../about.html"><svg class="doc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>关于项目</a>
       </nav>
     </div>
@@ -2377,7 +2393,7 @@
     var nameEl = document.getElementById('contactName');
     var msgEl = document.getElementById('contactMsg');
     var hp = document.getElementById('contactHp');
-    var REPO = 'https://github.com/shennanjaysn-cmyk/shennan-ai-daily';
+    var REPO = 'https://github.com/shennan-pro/shennan-ai-daily';
     if (!btn || !modal) return;
     function openM() { modal.classList.add('open'); modal.setAttribute('aria-hidden', 'false'); msgEl.focus(); }
     function shutM() { modal.classList.remove('open'); modal.setAttribute('aria-hidden', 'true'); }

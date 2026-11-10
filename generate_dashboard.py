@@ -54,10 +54,10 @@ BEIJING = timezone(timedelta(hours=8))
 # v1.2.0：①换用 SN_logo-2.png 新 logo；②副标题破折号改为两个字符宽横线；
 #         ③金色分割线拉长并与内容区对齐；④早中晚改为代码块样式并高亮当前时段；
 #         ⑤右上角增加最近一个月日报历史入口；⑥增加导出功能（PNG/HTML/Markdown/CSV/PDF）
-VERSION = "1.11.4"
+VERSION = "1.12.0"
 
 # 项目仓库地址（GitHub Pages 上线后生效；footer 的 LICENSE / 仓库地址 / README 链接依赖此值）
-REPO_URL = "https://github.com/shennanjaysn-cmyk/shennan-ai-daily"
+REPO_URL = "https://github.com/shennan-pro/shennan-ai-daily"
 
 # ===== 版块优先级与显示名映射 =====
 SECTION_PRIORITY = {
@@ -283,10 +283,15 @@ def export_csv(info):
 
 
 def aggregate_info(date_strs):
-    """Aggregate multiple daily briefings into one export-ready info object."""
+    """Aggregate multiple daily briefings into one export-ready info object.
+
+    v1.11.5：① 按原文链接去重（跨天重复出现的同一条不再计入）；② 每条带上 `date`，
+    供周报/月报卡片渲染日期标签——否则 56 张卡混在一页，读者无法判断先后。
+    """
     sections = {}
     total = 0
     all_items = []
+    seen_urls = set()
     gen_dt = ws_dt = we_dt = None
     d = None
     for ds in date_strs:
@@ -307,8 +312,13 @@ def aggregate_info(date_strs):
             if label not in sections:
                 sections[label] = {"label": label, "display_label": sec["display_label"], "items": []}
             for it in sec["items"]:
+                url = it.get("url") or ""
+                if url and url != "#":
+                    if url in seen_urls:
+                        continue
+                    seen_urls.add(url)
                 total += 1
-                item = {**it, "num": total}
+                item = {**it, "num": total, "date": ds[5:], "full_date": ds}
                 sections[label]["items"].append(item)
                 all_items.append({
                     "num": total,
@@ -352,10 +362,12 @@ def aggregate_info(date_strs):
 # ---------- render ----------
 def render_card(it, idx):
     num = f"{it['num']:02d}"
+    # v1.11.5：周报/月报的卡片补日期标签（aggregate_info 传入 date），单日页面不显示
+    date_chip = f'<span class="chip chip-date">{it["date"]}</span>' if it.get("date") else ""
     return f"""<a class="card" href="{it['url']}" target="_blank" rel="noopener noreferrer" style="--d:{idx % 6}">
   <div class="card-num">{num}</div>
   <div class="card-body">
-    <span class="chip">{it['source']}</span>
+    <div class="card-meta">{date_chip}<span class="chip">{it['source']}</span></div>
     <h3 class="card-title">{it['title']}</h3>
     <p class="card-summary">{it['summary']}</p>
   </div>
@@ -453,6 +465,7 @@ def render_html(info, page_info):
 
     is_report = page_info.get("is_report", False)
     is_index = page_info.get("is_index", False)  # _fix_vision_011：daily 历史页加"返回今日"，首页(index)已有今日数据故不加
+    rolling = page_info.get("rolling") or None    # v1.11.5：滚动窗口（最新一期条目过少时并入近 7 天）
     report_range = page_info.get("report_range", "week")
     if is_report:
         if report_range == "week":
@@ -471,8 +484,9 @@ def render_html(info, page_info):
         _r_label = "本周报" if report_range == "week" else "本月报"
         export_scope_block = f'      <div class="dropdown-section scope-head">导出{_r_label}</div>\n'
     else:
-        export_scope_block = '''      <div class="dropdown-section scope-head">导出范围</div>
-      <a class="dropdown-item scope-item active" href="#" data-export-scope="today">今天</a>
+        _today_label = f"本页（近 {rolling['rolling_days']} 天）" if rolling else "今天"
+        export_scope_block = f'''      <div class="dropdown-section scope-head">导出范围</div>
+      <a class="dropdown-item scope-item active" href="#" data-export-scope="today">{_today_label}</a>
       <a class="dropdown-item scope-item" href="#" data-export-scope="week">近一周</a>
       <a class="dropdown-item scope-item" href="#" data-export-scope="month">近一月</a>
       <div class="dropdown-divider"></div>
@@ -504,6 +518,15 @@ def render_html(info, page_info):
   <a class="{w_cls}" href="{doc_prefix}report-week.html">周报</a>
   <a class="{m_cls}" href="{doc_prefix}report-month.html">月报</a>
   <span class="nav-actions-sep" aria-hidden="true"></span>
+  <div class="dropdown" id="historyDropdown">
+    <button class="top-btn" type="button" aria-haspopup="true" aria-expanded="false">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      历史日报
+    </button>
+    <div class="dropdown-menu" role="menu">
+      {history_menu}
+    </div>
+  </div>
   <a class="back-today back-today-nav" href="{doc_prefix}index.html" title="返回今日日报">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9"/></svg>
     返回今日
@@ -593,7 +616,36 @@ def render_html(info, page_info):
           <span class="small">/ {hero_year}</span>
         </div>'''
         hero_meta_block = f'''<div class="hero-meta">送达时间：<span class="accent">{fmt_date_weekday(gen_dt)}</span></div>'''
-        hero_lead_text = f'覆盖窗口（北京时间，UTC+8）每日滚动更新。<br>以下 <span class="lead-strong">{total}</span> 条动态按版块归类，点卡片直达原文。<span class="hero-tip">?</span>'
+        if rolling:
+            hero_lead_text = (
+                f'最新一期（{rolling["latest_date"]}）仅 {rolling["small_total"]} 条，'
+                f'已自动并入最近 {rolling["rolling_days"]} 天滚动窗口（{rolling["rolling_span"]}）。'
+                f'<br>以下 <span class="lead-strong">{total}</span> 条动态按版块归类，点卡片直达原文。'
+                f'<span class="hero-tip">?</span>'
+            )
+        else:
+            hero_lead_text = f'覆盖窗口（北京时间，UTC+8）每日滚动更新。<br>以下 <span class="lead-strong">{total}</span> 条动态按版块归类，点卡片直达原文。<span class="hero-tip">?</span>'
+
+    # v1.11.5：报告页版块分布条 —— 一屏看清这段跨度的注意力去向（单日页没有必要，数据量太小）
+    dist_bar_html = ""
+    if is_report and total:
+        segs = "".join(
+            '<span class="dist-seg" style="flex:%d;opacity:%.2f" title="%s · %d 条（%.0f%%）"></span>'
+            % (s["count"], max(0.42, 1 - i * 0.14), s["display_label"], s["count"], s["count"] * 100.0 / total)
+            for i, s in enumerate(cards_by_section) if s["count"]
+        )
+        dist_bar_html = f'''<div class="dist">
+      <div class="dist-bar">{segs}</div>
+      <div class="dist-cap">版块分布 · {len(cards_by_section)} 类 / {total} 条</div>
+    </div>'''
+
+    # v1.11.5：页脚口径跟随页面——滚动窗口时不能还写"本期共"，否则读者以为只有这几天的量
+    if rolling:
+        footer_meta_html = (f'近 {rolling["rolling_days"]} 天共 <span class="num">{total}</span> 条 · '
+                            f'{len(cards_by_section)} 个版块 · 截至 {date_str}')
+    else:
+        footer_meta_html = (f'本期共 <span class="num">{total}</span> 条 · '
+                            f'{len(cards_by_section)} 个版块 · {date_str}')
 
     return f"""<!DOCTYPE html>
 <html lang="zh-CN">
@@ -1342,6 +1394,12 @@ def render_html(info, page_info):
     border-radius: 0 8px 8px 0;
   }}
   .hero-lead .lead-strong {{ color: var(--mist-body); }}
+  /* v1.11.5：报告页版块分布条（单色明度阶梯，跟正文的克制基调一致） */
+  .dist {{ margin-top: 22px; }}
+  .dist-bar {{ display: flex; height: 6px; border-radius: 3px; overflow: hidden; background: var(--line-faint); }}
+  .dist-seg {{ height: 100%; background: var(--brand-brief); transition: opacity .2s ease; }}
+  .dist-seg:hover {{ opacity: 1 !important; }}
+  .dist-cap {{ margin-top: 9px; font-size: 11px; color: var(--mist-faint); letter-spacing: 0.08em; }}
   .hero-tip {{
     display: inline-flex;
     align-items: center;
@@ -1682,6 +1740,15 @@ def render_html(info, page_info):
 
   .card-num {{ font-family: var(--font-num); font-weight: 300; font-size: 32px; color: var(--gold); line-height: 1; margin-bottom: 16px; letter-spacing: -0.02em; }}
   .card-body {{ flex: 1; display: flex; flex-direction: column; gap: 12px; }}
+  /* v1.11.5：日期标签 + 来源标签同一行（仅周报/月报出现日期） */
+  .card-meta {{ display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }}
+  .chip.chip-date {{
+    color: var(--brand-brief);
+    border-color: var(--line-gold);
+    background: transparent;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.06em;
+  }}
   .chip {{
     display: inline-block;
     align-self: flex-start;
@@ -2318,6 +2385,7 @@ def render_html(info, page_info):
         </div>
       </div>
     </div>
+    {dist_bar_html}
   </header>
 </div>
 
@@ -2341,7 +2409,7 @@ def render_html(info, page_info):
   <footer class="footer">
     <!-- 1 本期共 -->
     <div class="footer-meta">
-      本期共 <span class="num">{total}</span> 条 · {len(cards_by_section)} 个版块 · {date_str}
+      {footer_meta_html}
     </div>
     <!-- 2 数据源 -->
     <div class="footer-source">
@@ -2890,57 +2958,158 @@ def render_html(info, page_info):
 
 
 # ---------- 站内文档子页面（LICENSE / 免责声明 / 关于项目） ----------
+_MD_CODE = re.compile(r"`([^`\n]+)`")
+_MD_BOLD = re.compile(r"\*\*([^*\n]+)\*\*")
+_MD_ITALIC = re.compile(r"(?<!\*)\*(?!\s)([^*\n]+?)(?<!\s)\*(?!\*)")
+_MD_LINK = re.compile(r"\[([^\]]+)\]\(([^)\s]+)\)")
+
+
+def md_inline(text):
+    """行内语法。入参必须已 html.escape（先转义再解析，天然免疫注入）。"""
+    codes = []
+
+    def _keep_code(m):
+        codes.append("<code>" + m.group(1) + "</code>")
+        return "\x00%d\x00" % (len(codes) - 1)
+
+    def _link(m):
+        href = m.group(2)
+        if not re.match(r"^(https?://|mailto:|#|\.{0,2}/|[\w-]+\.html)", href):
+            href = "#"
+        ext = ' target="_blank" rel="noopener noreferrer"' if href.startswith("http") else ""
+        return '<a href="%s"%s>%s</a>' % (href, ext, m.group(1))
+
+    t = _MD_CODE.sub(_keep_code, text)          # 代码优先，避免内部 ** 被二次解析
+    t = _MD_BOLD.sub(lambda m: "<strong>" + m.group(1) + "</strong>", t)
+    t = _MD_ITALIC.sub(lambda m: "<em>" + m.group(1) + "</em>", t)
+    t = _MD_LINK.sub(_link, t)
+    return re.sub(r"\x00(\d+)\x00", lambda m: codes[int(m.group(1))], t)
+
+
 def md_light(md_text):
-    """极简 Markdown → HTML：标题 / 列表 / 段落 / 代码块，够用即可，不引第三方库。"""
-    lines = md_text.splitlines()
+    """极简 Markdown → HTML（零依赖）。
+
+    v1.11.5 重写：旧实现只认标题与无序列表，README/DISCLAIMER/LICENSE 里的
+    `**加粗**`、`` `代码` ``、`[链接](url)`、`> 引用`、`| 表格 |` 全部原样漏出
+    （线上实测 about.html 有 24 个字面 ** 与 56 个反引号），故补齐常用块级语法。
+    """
+    lines = md_text.replace("\r\n", "\n").split("\n")
+    n = len(lines)
     out = []
-    in_ul = False
-    in_pre = False
-    pre_buf = []
+    list_mode = None
+    i = 0
 
-    def close_ul():
-        nonlocal in_ul
-        if in_ul:
-            out.append("</ul>")
-            in_ul = False
+    def close_list():
+        nonlocal list_mode
+        if list_mode:
+            out.append("</%s>" % list_mode)
+            list_mode = None
 
-    for ln in lines:
-        s = ln.rstrip()
+    def open_list(kind):
+        nonlocal list_mode
+        if list_mode != kind:
+            close_list()
+            out.append("<%s>" % kind)
+            list_mode = kind
+
+    def is_table_sep(s):
+        return bool(re.match(r"^\|?[\s:|-]+\|[\s:|-]*$", s)) and "-" in s
+
+    def split_row(s):
+        s = s.strip()
+        if s.startswith("|"):
+            s = s[1:]
+        if s.endswith("|"):
+            s = s[:-1]
+        return [c.strip() for c in s.split("|")]
+
+    while i < n:
+        raw = lines[i]
+        s = raw.strip()
+
+        # 代码块
         if s.startswith("```"):
-            if in_pre:
-                out.append("<pre class='doc-pre'>" + html.escape("\n".join(pre_buf)) + "</pre>")
-                pre_buf = []
-                in_pre = False
-            else:
-                close_ul()
-                in_pre = True
+            close_list()
+            i += 1
+            buf = []
+            while i < n and not lines[i].strip().startswith("```"):
+                buf.append(lines[i])
+                i += 1
+            i += 1
+            out.append("<pre class='doc-pre'>" + html.escape("\n".join(buf)) + "</pre>")
             continue
-        if in_pre:
-            pre_buf.append(s)
+
+        if not s:
+            close_list()
+            i += 1
             continue
-        if not s.strip():
-            close_ul()
+
+        # 表格：本行有 |，且下一行是分隔行
+        if "|" in s and i + 1 < n and is_table_sep(lines[i + 1].strip()):
+            close_list()
+            head = split_row(s)
+            i += 2
+            rows = []
+            while i < n and lines[i].strip() and "|" in lines[i]:
+                rows.append(split_row(lines[i]))
+                i += 1
+            th = "".join("<th>" + md_inline(html.escape(c)) + "</th>" for c in head)
+            tb = "".join(
+                "<tr>" + "".join("<td>" + md_inline(html.escape(c)) + "</td>" for c in r) + "</tr>"
+                for r in rows
+            )
+            out.append('<div class="doc-table-wrap"><table class="doc-table"><thead><tr>'
+                       + th + "</tr></thead><tbody>" + tb + "</tbody></table></div>")
             continue
-        if s.startswith("### "):
-            close_ul()
-            out.append("<h3>" + html.escape(s[4:].strip()) + "</h3>")
-        elif s.startswith("## "):
-            close_ul()
-            out.append("<h2>" + html.escape(s[3:].strip()) + "</h2>")
-        elif s.startswith("# "):
-            close_ul()
-            out.append("<h2>" + html.escape(s[2:].strip()) + "</h2>")
-        elif s.startswith("- ") or s.startswith("* "):
-            if not in_ul:
-                out.append("<ul>")
-                in_ul = True
-            out.append("<li>" + html.escape(s[2:].strip()) + "</li>")
-        else:
-            close_ul()
-            out.append("<p>" + html.escape(s) + "</p>")
-    close_ul()
-    if in_pre:
-        out.append("<pre class='doc-pre'>" + html.escape("\n".join(pre_buf)) + "</pre>")
+
+        # 分隔线
+        if re.match(r"^(-{3,}|\*{3,}|_{3,})$", s):
+            close_list()
+            out.append("<hr>")
+            i += 1
+            continue
+
+        # 引用块（连续 > 行合并为一段）
+        if s.startswith(">"):
+            close_list()
+            buf = []
+            while i < n and lines[i].strip().startswith(">"):
+                buf.append(lines[i].strip()[1:].lstrip())
+                i += 1
+            inner = " ".join(x for x in buf if x).strip()
+            out.append("<blockquote><p>" + md_inline(html.escape(inner)) + "</p></blockquote>")
+            continue
+
+        # 标题
+        m = re.match(r"^(#{1,4})\s+(.*)$", s)
+        if m:
+            close_list()
+            tag = "h2" if len(m.group(1)) <= 2 else "h3"
+            out.append("<%s>%s</%s>" % (tag, md_inline(html.escape(m.group(2).strip())), tag))
+            i += 1
+            continue
+
+        # 有序列表
+        m = re.match(r"^\d+[.)]\s+(.*)$", s)
+        if m:
+            open_list("ol")
+            out.append("<li>" + md_inline(html.escape(m.group(1).strip())) + "</li>")
+            i += 1
+            continue
+
+        # 无序列表
+        m = re.match(r"^[-*+]\s+(.*)$", s)
+        if m:
+            open_list("ul")
+            out.append("<li>" + md_inline(html.escape(m.group(1).strip())) + "</li>")
+            i += 1
+            continue
+
+        close_list()
+        out.append("<p>" + md_inline(html.escape(s)) + "</p>")
+        i += 1
+
+    close_list()
     return "\n".join(out)
 
 
@@ -2950,6 +3119,12 @@ DOC_TEMPLATE = """<!DOCTYPE html>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>__TITLE__ · 深南AI日报</title>
+<meta name="description" content="__DESC__">
+<meta property="og:site_name" content="深南AI日报 Daily AI Brief">
+<meta property="og:title" content="__TITLE__ · 深南AI日报">
+<meta property="og:description" content="__DESC__">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
 <style>
 __FONTS__
   :root {
@@ -2984,52 +3159,161 @@ __FONTS__
   }
   * { margin:0; padding:0; box-sizing:border-box; }
   body { background:var(--ink-void); color:var(--mist-body); font-family:var(--font-base); line-height:1.8; -webkit-font-smoothing:antialiased; }
-  .doc-wrap { max-width:780px; margin:0 auto; padding:48px 24px 60px; }
-  .doc-home { display:inline-block; color:var(--brand-cn); text-decoration:none; font-size:13px; letter-spacing:.06em; margin-bottom:28px; opacity:.85; }
-  .doc-home:hover { opacity:1; }
+
+  /* v1.11.5：子页顶栏。此前文档页只有一句"← 返回首页"，三个子页之间无法互跳，
+     且完全没有主题切换（主页有浅色，点进 LICENSE 突然变深色，割裂感很强）。 */
+  .doc-top { position:sticky; top:0; z-index:20; background:var(--surface-float);
+    -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--line-faint); }
+  .doc-top-in { max-width:900px; margin:0 auto; padding:12px 24px;
+    display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+  .doc-logo { display:flex; align-items:center; gap:12px; text-decoration:none;
+    color:var(--text-primary); font-family:var(--font-cn-display); font-size:16px; letter-spacing:.04em; }
+  .doc-logo .sn-logo { width:26px; height:26px; object-fit:contain; }
+  .doc-nav { display:flex; align-items:center; gap:4px; margin-left:auto; flex-wrap:wrap; }
+  .doc-nav a { font-size:12.5px; color:var(--mist-dim); text-decoration:none;
+    padding:5px 10px; border-radius:6px; border:1px solid transparent; letter-spacing:.03em;
+    transition:color .18s ease, border-color .18s ease, background .18s ease; }
+  .doc-nav a:hover { color:var(--text-primary); border-color:var(--line); }
+  .doc-nav a.is-active { color:var(--brand-cn); border-color:var(--line-gold); background:var(--surface-chip); }
+
+  .doc-wrap { max-width:780px; margin:0 auto; padding:44px 24px 60px; }
   .doc-brand { display:flex; align-items:center; gap:14px; margin-bottom:6px; }
   .doc-brand .sn-logo { width:48px; height:48px; object-fit:contain; }
   .doc-brand h1 { font-family:var(--font-cn-display); font-weight:100; font-size:30px; color:var(--text-title); letter-spacing:.02em; }
-  .doc-body { margin-top:26px; }
-  .doc-body h2 { font-family:var(--font-cn-display); font-size:21px; color:var(--text-title); margin:28px 0 12px; font-weight:100; border-left:3px solid var(--brand-brief); padding-left:12px; }
-  .doc-body h3 { font-size:17px; color:var(--brand-cn); margin:20px 0 8px; }
+  .doc-body { margin-top:22px; }
+  .doc-body h2 { font-family:var(--font-cn-display); font-size:21px; color:var(--text-title); margin:30px 0 12px; font-weight:100; border-left:3px solid var(--brand-brief); padding-left:12px; }
+  .doc-body h3 { font-size:16px; color:var(--brand-cn); margin:22px 0 8px; }
   .doc-body p { margin:12px 0; color:var(--mist-body); }
-  .doc-body ul { margin:12px 0 12px 22px; }
+  .doc-body ul, .doc-body ol { margin:12px 0 12px 22px; }
   .doc-body li { margin:6px 0; }
-  .doc-body a { color:var(--brand-cn); }
-  .doc-pre { background:rgba(20,28,50,.6); border:1px solid rgba(46,58,124,.4); border-radius:8px; padding:16px 18px; overflow-x:auto; font-family:'SF Mono','Fira Code',Consolas,monospace; font-size:13px; color:var(--text-code); white-space:pre-wrap; word-break:break-word; }
-  .doc-foot { margin-top:48px; padding-top:20px; border-top:1px solid var(--line-gold); text-align:center; font-size:12px; color:var(--mist-faint); letter-spacing:.08em; }
-  /* v1.11.1：子页面（LICENSE / 免责声明 / 关于项目 / 聚合报告）移动端字号与主页同步收小，
-     避免"主页变小、子页没变"的割裂感 */
+  .doc-body a { color:var(--text-link); text-decoration:none; border-bottom:1px solid var(--line); }
+  .doc-body a:hover { border-bottom-color:var(--brand-cn); }
+  /* v1.11.5：以下四种元素此前完全没有样式（甚至渲染不出来），现在按正文节奏补齐 */
+  .doc-body strong { color:var(--text-primary); font-weight:600; }
+  .doc-body code { font-family:'SF Mono','Fira Code',Consolas,monospace; font-size:.88em;
+    background:var(--surface-code); border:1px solid var(--line-faint); border-radius:4px;
+    padding:1px 5px; color:var(--text-code); word-break:break-word; }
+  .doc-body blockquote { margin:16px 0; padding:10px 16px; border-left:3px solid var(--line-gold);
+    background:var(--surface-chip); border-radius:0 6px 6px 0; }
+  .doc-body blockquote p { margin:0; color:var(--mist-dim); font-size:.94em; }
+  .doc-body hr { margin:28px 0; border:0; height:1px; background:var(--line-gold); opacity:.55; }
+  .doc-table-wrap { margin:18px 0; overflow-x:auto; border:1px solid var(--line-faint); border-radius:8px; }
+  .doc-table { width:100%; border-collapse:collapse; font-size:13.5px; }
+  .doc-table th, .doc-table td { padding:9px 12px; text-align:left; border-bottom:1px solid var(--line-faint); vertical-align:top; }
+  .doc-table th { color:var(--brand-cn); font-weight:500; background:var(--surface-chip); white-space:nowrap; }
+  .doc-table tr:last-child td { border-bottom:0; }
+  .doc-table td { color:var(--mist-body); }
+  .doc-pre { background:var(--surface-code); border:1px solid var(--line); border-radius:8px; padding:16px 18px; overflow-x:auto; font-family:'SF Mono','Fira Code',Consolas,monospace; font-size:13px; color:var(--text-code); white-space:pre-wrap; word-break:break-word; }
+  .doc-foot { margin-top:52px; padding-top:20px; border-top:1px solid var(--line-gold); text-align:center; font-size:12px; color:var(--mist-faint); letter-spacing:.06em; }
+  .doc-foot-links { display:flex; align-items:center; justify-content:center; gap:8px 16px; flex-wrap:wrap; margin-bottom:12px; }
+  .doc-foot-links a { color:var(--mist-dim); text-decoration:none; font-size:12px; }
+  .doc-foot-links a:hover { color:var(--text-primary); }
+
+  /* 主题切换：与主页同一颗 FAB，同一份 localStorage key（sn-theme） */
+  .doc-fab { position:fixed; right:22px; bottom:22px; width:44px; height:44px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+    background:var(--surface-float); border:1px solid var(--line); color:var(--mist);
+    -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px);
+    box-shadow:0 6px 22px var(--shadow); transition:transform .2s ease, border-color .2s ease; }
+  .doc-fab:hover { transform:translateY(-2px); border-color:var(--line-gold); }
+  .doc-fab svg { width:18px; height:18px; }
+
+  /* v1.11.1：子页面移动端字号与主页同步收小，避免"主页变小、子页没变"的割裂感 */
   @media (max-width: 880px) {
-    .doc-wrap { padding: 28px 20px 44px; }
-    .doc-home { font-size: 12px; margin-bottom: 20px; }
+    .doc-top-in { padding:10px 16px; gap:10px; }
+    .doc-logo { font-size:14px; }
+    .doc-logo .sn-logo { width:22px; height:22px; }
+    .doc-nav { gap:2px; margin-left:0; width:100%; overflow-x:auto; flex-wrap:nowrap;
+      -webkit-overflow-scrolling:touch; overscroll-behavior-x:contain; padding-bottom:2px; }
+    .doc-nav a { font-size:11.5px; padding:4px 8px; white-space:nowrap; }
+    .doc-wrap { padding: 26px 18px 44px; }
     .doc-brand { gap: 10px; }
     .doc-brand .sn-logo { width: 38px; height: 38px; }
-    .doc-brand h1 { font-size: 24px; }
-    .doc-body { margin-top: 20px; }
+    .doc-brand h1 { font-size: 23px; }
+    .doc-body { margin-top: 18px; }
     .doc-body h2 { font-size: 17px; margin: 22px 0 10px; padding-left: 10px; }
     .doc-body h3 { font-size: 15px; }
     .doc-body p, .doc-body li { font-size: 13px; }
+    .doc-table { font-size: 12px; }
+    .doc-table th, .doc-table td { padding: 7px 9px; }
     .doc-pre { font-size: 11px; padding: 12px 14px; }
-    .doc-foot { font-size: 10px; margin-top: 34px; }
+    .doc-foot { font-size: 10.5px; margin-top: 34px; }
+    .doc-fab { right: 14px; bottom: 14px; width: 40px; height: 40px; }
   }
 </style>
 </head>
 <body>
-<div class="doc-wrap">
-  <a class="doc-home" href="./">← 返回首页 / Home</a>
-  <div class="doc-brand">__LOGO__<h1>__TITLE__</h1></div>
+<header class="doc-top">
+  <div class="doc-top-in">
+    <a class="doc-logo" href="./">__LOGO__<span>深南AI日报</span></a>
+    <nav class="doc-nav" aria-label="站内导航">__NAV__</nav>
+  </div>
+</header>
+<main class="doc-wrap">
+  <div class="doc-brand"><h1>__TITLE__</h1></div>
   <div class="doc-body">__BODY__</div>
-  <div class="doc-foot">深南Ai视界 · Daily AI Brief · 开源非盈利</div>
-</div>
+  <footer class="doc-foot">
+    <div class="doc-foot-links">__FOOTNAV__</div>
+    <div>深南Ai视界 · Daily AI Brief · 开源非盈利 · 数据源 aihot.news</div>
+  </footer>
+</main>
+<button class="doc-fab" id="themeToggle" type="button" aria-label="切换主题" title="切换主题" onclick="snToggle()"></button>
+<script>
+(function () {
+  var SUN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
+  var MOON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+  function apply(t) {
+    document.documentElement.setAttribute('data-theme', t);
+    var b = document.getElementById('themeToggle');
+    if (b) {
+      b.innerHTML = (t === 'light') ? MOON : SUN;
+      var tip = (t === 'light') ? '当前：浅色，点击切到深色' : '当前：深色，点击切到浅色';
+      b.title = tip; b.setAttribute('aria-label', tip);
+    }
+  }
+  var saved = null;
+  try { saved = localStorage.getItem('sn-theme'); } catch (e) {}
+  if (saved !== 'light' && saved !== 'dark') {
+    var h = (new Date().getUTCHours() + 8) % 24;
+    saved = (h >= 6 && h < 18) ? 'light' : 'dark';
+  }
+  apply(saved);
+  window.snToggle = function () {
+    var cur = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+    try { localStorage.setItem('sn-theme', cur); } catch (e) {}
+    apply(cur);
+  };
+})();
+</script>
 </body>
 </html>"""
 
 
-def render_doc_page(title, body_html, logo_img, fonts_css):
+# 子页互跳：顺序即展示顺序
+DOC_NAV = [
+    ("index", "首页", "./"),
+    ("report", "聚合报告", "./report-week.html"),
+    ("about", "关于项目", "./about.html"),
+    ("disclaimer", "免责声明", "./disclaimer.html"),
+    ("license", "LICENSE", "./license.html"),
+    ("repo", "仓库地址", REPO_URL),
+]
+
+
+def render_doc_page(title, body_html, logo_img, fonts_css, active="", desc=""):
+    nav_parts, foot_parts = [], []
+    for key, label, href in DOC_NAV:
+        ext = ' target="_blank" rel="noopener noreferrer"' if href.startswith("http") else ""
+        cls = ' class="is-active"' if key == active else ""
+        nav_parts.append(f'<a href="{href}"{cls}{ext}>{label}</a>')
+        foot_parts.append(f'<a href="{href}"{ext}>{label}</a>')
+    desc = desc or "深南AI日报 Daily AI Brief —— 每日 AI 资讯聚合仪表盘，开源非盈利。"
     return (DOC_TEMPLATE
             .replace("__TITLE__", title)
+            .replace("__DESC__", html.escape(desc))
+            .replace("__NAV__", "\n      ".join(nav_parts))
+            .replace("__FOOTNAV__", "\n      ".join(foot_parts))
             .replace("__LOGO__", logo_img)
             .replace("__FONTS__", fonts_css)
             .replace("__BODY__", body_html))
@@ -3081,10 +3365,35 @@ def main():
     if latest_date not in available_dates:
         available_dates.insert(0, latest_date)
 
+    # v1.11.5：滚动窗口兜底。
+    # 上游周日/假日经常只发 1～2 条，当日未发布时 latest 又会回退到上一期 ——
+    # 两种情况都会让首页只剩一张孤零零的卡。此时把最近 7 天并成一页，宁多勿空。
+    ROLLING_MIN_ITEMS, ROLLING_DAYS = 3, 7
+    rolling = None
+    if latest_info["total"] < ROLLING_MIN_ITEMS and len(available_dates) >= 2:
+        win_dates = available_dates[:ROLLING_DAYS]
+        merged = aggregate_info(win_dates)
+        if merged["total"] > latest_info["total"]:
+            merged["is_rolling"] = True
+            merged["rolling_days"] = len(win_dates)
+            merged["rolling_span"] = f"{win_dates[-1][5:]} ~ {win_dates[0][5:]}"
+            merged["rolling_from"] = win_dates[-1]
+            merged["latest_date"] = latest_date
+            merged["small_total"] = latest_info["total"]
+            merged["d"] = latest_info["d"]          # 大字日期仍是"最新一期"，不改成区间
+            merged["gen_dt"] = latest_info["gen_dt"]
+            merged["date_str"] = latest_date        # 主日期口径不变，标题/存档名不被拉成区间
+            latest_info = merged
+            rolling = merged
+            print(
+                f"Rolling window: 最新一期({latest_date}) 仅 {merged['small_total']} 条 "
+                f"→ 并入最近 {len(win_dates)} 天共 {merged['total']} 条"
+            )
+
     # Export scopes: today / week / month
     export_scopes = {
         "today": {
-            "date": latest_date,
+            "date": f"{rolling['rolling_from']} ~ {latest_date}" if rolling else latest_date,
             "markdown": export_markdown(latest_info),
             "csv": export_csv(latest_info),
         }
@@ -3161,7 +3470,7 @@ def main():
     # Generate latest index.html
     index_page = render_html(
         latest_info,
-        {**page_common, "history_prefix": "./daily/", "asset_base": "", "doc_prefix": "", "current_date": latest_date, "available_dates": available_dates, "is_index": True, "export_scopes": export_scopes}
+        {**page_common, "history_prefix": "./daily/", "asset_base": "", "doc_prefix": "", "current_date": latest_date, "available_dates": available_dates, "is_index": True, "export_scopes": export_scopes, "rolling": rolling}
     )
     latest_file = RELEASES / "index.html"
     latest_file.write_text(index_page, encoding="utf-8")
@@ -3190,7 +3499,7 @@ def main():
     dated_release = RELEASES / versioned_name
     page = render_html(
         latest_info,
-        {**page_common, "history_prefix": "./daily/", "asset_base": "", "doc_prefix": "", "current_date": latest_date, "available_dates": available_dates, "is_index": False, "export_scopes": export_scopes}
+        {**page_common, "history_prefix": "./daily/", "asset_base": "", "doc_prefix": "", "current_date": latest_date, "available_dates": available_dates, "is_index": False, "export_scopes": export_scopes, "rolling": rolling}
     )
     dated_release.write_text(page, encoding="utf-8")
 
@@ -3198,15 +3507,25 @@ def main():
     def _read_doc(p):
         fp = BASE / p
         return fp.read_text(encoding="utf-8") if fp.exists() else "（内容缺失）"
-    license_body = "<pre class='doc-pre'>" + html.escape(_read_doc("LICENSE")) + "</pre>"
+    # v1.11.5：LICENSE 前段（MIT 正文）保持 verbatim 代码块，后段「授权范围说明」是 markdown，交渲染器处理
+    lic_raw = _read_doc("LICENSE")
+    lic_head, _sep, lic_tail = lic_raw.partition("\n---\n")
+    license_body = "<pre class='doc-pre'>" + html.escape(lic_head.strip()) + "</pre>"
+    if lic_tail.strip():
+        license_body += md_light(lic_tail)
     disclaimer_body = md_light(_read_doc("DISCLAIMER.md"))
-    about_body = md_light(_read_doc("README.md"))
-    for fname, ttl, body in [
-        ("license.html", "开源许可 LICENSE", license_body),
-        ("disclaimer.html", "免责声明 Disclaimer", disclaimer_body),
-        ("about.html", "关于本项目 About", about_body),
+    # v1.11.5：关于页改读 ABOUT.md（面向读者）。此前直接渲染开发者 README（目录结构/构建脚本/部署流程），
+    # 读者点进来看到的是工程文档，加上 markdown 渲染残缺，实际等于一页乱码。
+    about_body = md_light(_read_doc("ABOUT.md") if (BASE / "ABOUT.md").exists() else _read_doc("README.md"))
+    for fname, ttl, body, act, dsc in [
+        ("license.html", "开源许可 LICENSE", license_body, "license",
+         "深南AI日报源代码以 MIT 协议开放；聚合内容版权归原权利人所有，不随代码授权。"),
+        ("disclaimer.html", "免责声明 Disclaimer", disclaimer_body, "disclaimer",
+         "本站为信息聚合与索引，不构成投资、医疗、法律等专业建议；内容版权归原权利人。"),
+        ("about.html", "关于本项目 About", about_body, "about",
+         "深南AI日报是什么、每天怎么更新、数据从哪来、如何订阅与反馈。"),
     ]:
-        (RELEASES / fname).write_text(render_doc_page(ttl, body, logo_img, fonts_css), encoding="utf-8")
+        (RELEASES / fname).write_text(render_doc_page(ttl, body, logo_img, fonts_css, active=act, desc=dsc), encoding="utf-8")
         print(f"OK -> doc page: {fname}")
 
     # 禁用 Jekyll（避免 GitHub Pages 清空预构建 HTML）

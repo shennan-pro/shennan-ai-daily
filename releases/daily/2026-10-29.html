@@ -794,6 +794,12 @@
     border-radius: 0 8px 8px 0;
   }
   .hero-lead .lead-strong { color: var(--mist-body); }
+  /* v1.11.5：报告页版块分布条（单色明度阶梯，跟正文的克制基调一致） */
+  .dist { margin-top: 22px; }
+  .dist-bar { display: flex; height: 6px; border-radius: 3px; overflow: hidden; background: var(--line-faint); }
+  .dist-seg { height: 100%; background: var(--brand-brief); transition: opacity .2s ease; }
+  .dist-seg:hover { opacity: 1 !important; }
+  .dist-cap { margin-top: 9px; font-size: 11px; color: var(--mist-faint); letter-spacing: 0.08em; }
   .hero-tip {
     display: inline-flex;
     align-items: center;
@@ -1134,6 +1140,15 @@
 
   .card-num { font-family: var(--font-num); font-weight: 300; font-size: 32px; color: var(--gold); line-height: 1; margin-bottom: 16px; letter-spacing: -0.02em; }
   .card-body { flex: 1; display: flex; flex-direction: column; gap: 12px; }
+  /* v1.11.5：日期标签 + 来源标签同一行（仅周报/月报出现日期） */
+  .card-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .chip.chip-date {
+    color: var(--brand-brief);
+    border-color: var(--line-gold);
+    background: transparent;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.06em;
+  }
   .chip {
     display: inline-block;
     align-self: flex-start;
@@ -1779,6 +1794,7 @@
         </div>
       </div>
     </div>
+    
   </header>
 </div>
 
@@ -1814,7 +1830,9 @@
       历史日报
     </button>
     <div class="dropdown-menu" role="menu">
-      <a class="dropdown-item" href="./2026-11-08.html">2026-11-08</a>
+      <a class="dropdown-item" href="./2026-11-10.html">2026-11-10</a>
+<a class="dropdown-item" href="./2026-11-09.html">2026-11-09</a>
+<a class="dropdown-item" href="./2026-11-08.html">2026-11-08</a>
 <a class="dropdown-item" href="./2026-11-07.html">2026-11-07</a>
 <a class="dropdown-item" href="./2026-11-06.html">2026-11-06</a>
 <a class="dropdown-item" href="./2026-11-05.html">2026-11-05</a>
@@ -1841,8 +1859,6 @@
 <a class="dropdown-item" href="./2026-10-14.html">2026-10-14</a>
 <a class="dropdown-item" href="./2026-10-13.html">2026-10-13</a>
 <a class="dropdown-item" href="./2026-10-12.html">2026-10-12</a>
-<a class="dropdown-item" href="./2026-10-11.html">2026-10-11</a>
-<a class="dropdown-item" href="./2026-10-10.html">2026-10-10</a>
     </div>
   </div>
   <div class="dropdown" id="exportDropdown">
@@ -1882,7 +1898,7 @@
 <a class="card" href="https://deepmind.google/blog/gemini-4-carbon-our-next-frontier-model/" target="_blank" rel="noopener noreferrer" style="--d:0">
   <div class="card-num">01</div>
   <div class="card-body">
-    <span class="chip">Google DeepMind：Blog（RSS）</span>
+    <div class="card-meta"><span class="chip">Google DeepMind：Blog（RSS）</span></div>
     <h3 class="card-title">Google DeepMind 发布 Gemini 4 Carbon 前沿模型</h3>
     <p class="card-summary">Google DeepMind 发布 Gemini 4 Carbon，定位为最强前沿模型，主打网络安全与长程智能体能力，在 SEC-bench Pro 88.2%、ExploitGym 54.8%、CWE-bench 71.0% 取得领先，并以 59 分登顶 Artificial Analysis Intelligence Index v5.0。</p>
   </div>
@@ -1891,7 +1907,7 @@
 <a class="card" href="https://mp.weixin.qq.com/s?__biz=Mzg3Mzg2MTg2NQ%3D%3D&mid=2247499654&idx=1&sn=9bcbf9492c492a5d5e611af41670425f" target="_blank" rel="noopener noreferrer" style="--d:1">
   <div class="card-num">02</div>
   <div class="card-body">
-    <span class="chip">公众号：面壁智能（MiniCPM）</span>
+    <div class="card-meta"><span class="chip">公众号：面壁智能（MiniCPM）</span></div>
     <h3 class="card-title">面壁智能发布并开源 MiniCPM-OCR 系列：1.3B 解析模型与 2B 判别模型</h3>
     <p class="card-summary">面壁智能发布并开源 MiniCPM-OCR 系列。MiniCPM-OCR 1.0（1.3B）在 Real5-OmniDocBench 取得 93.68 分、OCRBench v2 取得 54.7 分的 SOTA，经 DSpark 加速后吞吐达 1.217 页/秒，端到端效率提升 55%。</p>
   </div>
@@ -1910,7 +1926,7 @@
 <a class="card" href="https://github.blog/news-insights/company-news/github-universe-2026-evolving-every-layer-of-the-stack/" target="_blank" rel="noopener noreferrer" style="--d:0">
   <div class="card-num">03</div>
   <div class="card-body">
-    <span class="chip">GitHub Blog</span>
+    <div class="card-meta"><span class="chip">GitHub Blog</span></div>
     <h3 class="card-title">GitHub Universe 2026 发布 GitHub Copilot app、Copilot Fusion 等智能体产品</h3>
     <p class="card-summary">GitHub 在 GitHub Universe 2026 上提出把 GitHub 打造为完整软件交付系统的愿景，并发布多项产品：GitHub Copilot app 面向智能体交付。</p>
   </div>
@@ -1919,7 +1935,7 @@
 <a class="card" href="https://blogs.microsoft.com/blog/2026/10/28/introducing-the-microsoft-copilot-harness-unlocking-the-potential-of-truly-multi-model-agentic-work/" target="_blank" rel="noopener noreferrer" style="--d:1">
   <div class="card-num">04</div>
   <div class="card-body">
-    <span class="chip">Microsoft：Official Blog（RSS）</span>
+    <div class="card-meta"><span class="chip">Microsoft：Official Blog（RSS）</span></div>
     <h3 class="card-title">Microsoft 通过 Foundry 开放 Copilot harness，支持多模型 Agent 开发</h3>
     <p class="card-summary">Microsoft 宣布将 GitHub 团队打造的 Copilot harness 通过 Microsoft Foundry 向开发者和企业开放，该 harness 已驱动 Copilot Code、Copilot Studio、GitHub Copilot app 和 CLI 等产品。</p>
   </div>
@@ -1938,7 +1954,7 @@
 <a class="card" href="https://techcrunch.com/2026/10/27/vcs-will-make-billions-on-anthropics-ipo-but-amazon-is-set-to-make-much-much-more/" target="_blank" rel="noopener noreferrer" style="--d:0">
   <div class="card-num">05</div>
   <div class="card-body">
-    <span class="chip">TechCrunch：AI（RSS）</span>
+    <div class="card-meta"><span class="chip">TechCrunch：AI（RSS）</span></div>
     <h3 class="card-title">Anthropic IPO 最大赢家或为 Amazon 而非 VC</h3>
     <p class="card-summary">TechCrunch 根据 Anthropic 的 S-1 分析，VC 持股均不足 5%，而 Amazon 可能是 IPO 最大财务受益方。Amazon 持有 62 亿美元本金可转债、其自估持仓价值 979 亿美元，另投 100 亿美元无投票权优先股，累计投资约 180 亿美元；Anthropic 还承诺未来 10 年在 AWS 至少消费 1100 亿美元。</p>
   </div>
@@ -1947,7 +1963,7 @@
 <a class="card" href="https://github.blog/news-insights/octoverse/octoverse-commits-pushes-reach-new-highs-in-2026-as-developers-build-with-agents/" target="_blank" rel="noopener noreferrer" style="--d:1">
   <div class="card-num">06</div>
   <div class="card-body">
-    <span class="chip">GitHub Blog</span>
+    <div class="card-meta"><span class="chip">GitHub Blog</span></div>
     <h3 class="card-title">GitHub Octoverse 2026：开发活动创新高，超 40% 的 PR 由智能体起草</h3>
     <p class="card-summary">GitHub 发布 2026 年度 Octoverse 报告：过去 12 个月开发者推送代码 179 亿次，超过 2024 和 2025 年之和，合并 PR 达 13 亿次。</p>
   </div>
@@ -1956,7 +1972,7 @@
 <a class="card" href="https://x.com/sundarpichai/status/2115535455156642066" target="_blank" rel="noopener noreferrer" style="--d:2">
   <div class="card-num">07</div>
   <div class="card-body">
-    <span class="chip">X：Sundar Pichai (@sundarpichai)</span>
+    <div class="card-meta"><span class="chip">X：Sundar Pichai (@sundarpichai)</span></div>
     <h3 class="card-title">Alphabet Q3 财报：年化收入达 5000 亿美元，Google Cloud 增长 103%</h3>
     <p class="card-summary">Sundar Pichai 发布 Alphabet Q3 业绩：年化收入 run rate 达 5000 亿美元，总收入同比增长 25%。Google Cloud 收入增长 103%，1P 模型 API 每分钟处理近 32B tokens（环比增 40%）；Search 查询同比增速为五年来最高，并提到 Argon、Carbon 领跑前沿及最新世界模型 Genie 4。</p>
   </div>
@@ -1965,7 +1981,7 @@
 <a class="card" href="https://x.com/satyanadella/status/2115577764300693644" target="_blank" rel="noopener noreferrer" style="--d:3">
   <div class="card-num">08</div>
   <div class="card-body">
-    <span class="chip">X：Satya Nadella (@satyanadella)</span>
+    <div class="card-meta"><span class="chip">X：Satya Nadella (@satyanadella)</span></div>
     <h3 class="card-title">微软财报电话会：Microsoft Cloud 收入超 $63B，同比增长 30%</h3>
     <p class="card-summary">Satya Nadella 结束微软财报电话会，称财年开局强劲。Microsoft Cloud 收入超过 $63B，同比增长加快至 30%。他提到正围绕 agentic 浪潮构建新技术栈，有多项创新亮点。</p>
   </div>
@@ -1984,7 +2000,7 @@
 <a class="card" href="https://www.ithome.com/1/019/268.htm" target="_blank" rel="noopener noreferrer" style="--d:0">
   <div class="card-num">09</div>
   <div class="card-body">
-    <span class="chip">IT之家·人工智能</span>
+    <div class="card-meta"><span class="chip">IT之家·人工智能</span></div>
     <h3 class="card-title">Anthropic 报告：Claude 研究模型在 Chrome、Safari、Android、Windows、Linux 发现漏洞并串联 5 条攻击链</h3>
     <p class="card-summary">Anthropic 于 10 月 27 日发布研究报告，称一个未公开的内部 Claude 研究模型在 Chrome、Safari、Android、Windows 和 Linux 中发现漏洞，串联出 5 条可实际运行的攻击链，相关漏洞已按协调披露流程报告并修复。</p>
   </div>
@@ -2003,7 +2019,7 @@
 <a class="card" href="https://openrouter.ai/blog/tutorials/claude-code-usage-limit/" target="_blank" rel="noopener noreferrer" style="--d:0">
   <div class="card-num">10</div>
   <div class="card-body">
-    <span class="chip">OpenRouter：Announcements（RSS）</span>
+    <div class="card-meta"><span class="chip">OpenRouter：Announcements（RSS）</span></div>
     <h3 class="card-title">Claude Code 触发用量上限后如何用 OpenRouter 继续编码</h3>
     <p class="card-summary">OpenRouter 介绍 Claude Code 触发用量上限时改用 OpenRouter API key 继续编码的方法：设置三个环境变量或用 Ori Harness 的 ori claude 命令，即可按 token 付费使用同样的 Claude 模型，没有五小时和每周限制。</p>
   </div>
@@ -2012,7 +2028,7 @@
 <a class="card" href="https://x.com/addyosmani/status/2115326629488824753" target="_blank" rel="noopener noreferrer" style="--d:1">
   <div class="card-num">11</div>
   <div class="card-body">
-    <span class="chip">X：Addy Osmani (@addyosmani)</span>
+    <div class="card-meta"><span class="chip">X：Addy Osmani (@addyosmani)</span></div>
     <h3 class="card-title">Addy Osmani 讲解如何上手 Claude Code Mods</h3>
     <p class="card-summary">Addy Osmani 发布 Claude Code Mods 上手指南，说明 mods 是运行在会话中的 JavaScript/TypeScript 文件，可通过 hooks 观察事件、改写行为或渲染自定义界面。</p>
   </div>
@@ -2021,7 +2037,7 @@
 <a class="card" href="https://openai.com/index/the-future-of-the-firm" target="_blank" rel="noopener noreferrer" style="--d:2">
   <div class="card-num">12</div>
   <div class="card-body">
-    <span class="chip">OpenAI：官网动态（RSS · 排除企业/客户案例）</span>
+    <div class="card-meta"><span class="chip">OpenAI：官网动态（RSS · 排除企业/客户案例）</span></div>
     <h3 class="card-title">OpenAI 员工撰文探讨 AI 进入企业组织架构的三种方式</h3>
     <p class="card-summary">OpenAI 员工 Hemanth Asirvatham 和 Elliott Mokski 发表下一篇经济系列文章，探讨 AI 进入企业组织架构的三种情形：在每位员工之下形成 AI 劳动力 basement、作为同事穿插在现有组织图中、以及夹在人类之间充当协调层。</p>
   </div>
@@ -2054,7 +2070,7 @@
         <a href="../report.html"><svg class="doc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>聚合报告</a>
         <a href="../license.html"><svg class="doc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 4-1.34 4-4V3"/><path d="M21 7h-2c-2 0 4-1.34 4-4V3"/></svg>LICENSE</a>
         <a href="../disclaimer.html"><svg class="doc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>免责声明</a>
-        <a href="https://github.com/shennanjaysn-cmyk/shennan-ai-daily" target="_blank" rel="noopener noreferrer"><svg class="doc-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.419-1.305.762-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>仓库地址</a>
+        <a href="https://github.com/shennan-pro/shennan-ai-daily" target="_blank" rel="noopener noreferrer"><svg class="doc-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.419-1.305.762-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>仓库地址</a>
         <a href="../about.html"><svg class="doc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>关于项目</a>
       </nav>
     </div>
@@ -2377,7 +2393,7 @@
     var nameEl = document.getElementById('contactName');
     var msgEl = document.getElementById('contactMsg');
     var hp = document.getElementById('contactHp');
-    var REPO = 'https://github.com/shennanjaysn-cmyk/shennan-ai-daily';
+    var REPO = 'https://github.com/shennan-pro/shennan-ai-daily';
     if (!btn || !modal) return;
     function openM() { modal.classList.add('open'); modal.setAttribute('aria-hidden', 'false'); msgEl.focus(); }
     function shutM() { modal.classList.remove('open'); modal.setAttribute('aria-hidden', 'true'); }

@@ -794,6 +794,12 @@
     border-radius: 0 8px 8px 0;
   }
   .hero-lead .lead-strong { color: var(--mist-body); }
+  /* v1.11.5：报告页版块分布条（单色明度阶梯，跟正文的克制基调一致） */
+  .dist { margin-top: 22px; }
+  .dist-bar { display: flex; height: 6px; border-radius: 3px; overflow: hidden; background: var(--line-faint); }
+  .dist-seg { height: 100%; background: var(--brand-brief); transition: opacity .2s ease; }
+  .dist-seg:hover { opacity: 1 !important; }
+  .dist-cap { margin-top: 9px; font-size: 11px; color: var(--mist-faint); letter-spacing: 0.08em; }
   .hero-tip {
     display: inline-flex;
     align-items: center;
@@ -1134,6 +1140,15 @@
 
   .card-num { font-family: var(--font-num); font-weight: 300; font-size: 32px; color: var(--gold); line-height: 1; margin-bottom: 16px; letter-spacing: -0.02em; }
   .card-body { flex: 1; display: flex; flex-direction: column; gap: 12px; }
+  /* v1.11.5：日期标签 + 来源标签同一行（仅周报/月报出现日期） */
+  .card-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .chip.chip-date {
+    color: var(--brand-brief);
+    border-color: var(--line-gold);
+    background: transparent;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.06em;
+  }
   .chip {
     display: inline-block;
     align-self: flex-start;
@@ -1779,6 +1794,7 @@
         </div>
       </div>
     </div>
+    
   </header>
 </div>
 
@@ -1814,7 +1830,9 @@
       历史日报
     </button>
     <div class="dropdown-menu" role="menu">
-      <a class="dropdown-item" href="./2026-11-08.html">2026-11-08</a>
+      <a class="dropdown-item" href="./2026-11-10.html">2026-11-10</a>
+<a class="dropdown-item" href="./2026-11-09.html">2026-11-09</a>
+<a class="dropdown-item" href="./2026-11-08.html">2026-11-08</a>
 <a class="dropdown-item" href="./2026-11-07.html">2026-11-07</a>
 <a class="dropdown-item" href="./2026-11-06.html">2026-11-06</a>
 <a class="dropdown-item" href="./2026-11-05.html">2026-11-05</a>
@@ -1841,8 +1859,6 @@
 <a class="dropdown-item" href="./2026-10-14.html">2026-10-14</a>
 <a class="dropdown-item" href="./2026-10-13.html">2026-10-13</a>
 <a class="dropdown-item" href="./2026-10-12.html">2026-10-12</a>
-<a class="dropdown-item" href="./2026-10-11.html">2026-10-11</a>
-<a class="dropdown-item" href="./2026-10-10.html">2026-10-10</a>
     </div>
   </div>
   <div class="dropdown" id="exportDropdown">
@@ -1882,7 +1898,7 @@
 <a class="card" href="https://x.com/GeminiApp/status/2110491358498865638" target="_blank" rel="noopener noreferrer" style="--d:0">
   <div class="card-num">01</div>
   <div class="card-body">
-    <span class="chip">X：Gemini (@GeminiApp)</span>
+    <div class="card-meta"><span class="chip">X：Gemini (@GeminiApp)</span></div>
     <h3 class="card-title">Gemini 4 Argon 向全球 Google AI Pro 和 Ultra 订阅者开放</h3>
     <p class="card-summary">Gemini 官方宣布 Gemini 4 Argon 已向全球 Google AI Pro 和 Ultra 订阅者开放。该模型此前已在 Gemini 应用中逐步推出，定位为处理复杂任务的前沿模型，更多详情见官方推文线程 https://x.com/GeminiApp/status/2110039322229649783。</p>
   </div>
@@ -1901,7 +1917,7 @@
 <a class="card" href="https://x.ai/news/grok-voice-3" target="_blank" rel="noopener noreferrer" style="--d:0">
   <div class="card-num">02</div>
   <div class="card-body">
-    <span class="chip">xAI：News（网页）</span>
+    <div class="card-meta"><span class="chip">xAI：News（网页）</span></div>
     <h3 class="card-title">xAI 发布 Grok Voice 3.0 语音模型</h3>
     <p class="card-summary">xAI 发布 speech-to-speech 模型 Grok Voice 3.0，在 Artificial Analysis 的 Speech-to-Speech Index 以 86.9 分排名第一，时延低于一秒。</p>
   </div>
@@ -1910,7 +1926,7 @@
 <a class="card" href="https://research.google/blog/analyzing-technical-documents-with-deep-review/" target="_blank" rel="noopener noreferrer" style="--d:1">
   <div class="card-num">03</div>
   <div class="card-body">
-    <span class="chip">Google Research：Blog（网页）</span>
+    <div class="card-meta"><span class="chip">Google Research：Blog（网页）</span></div>
     <h3 class="card-title">Google 发布智能体审稿系统 Deep Review，支持多领域技术文档审查</h3>
     <p class="card-summary">Google 公开发布智能体审阅系统 Deep Review，可对复杂技术文档提供反馈与验证，最初面向计算机科学论文，现已扩展到法律、金融等领域。</p>
   </div>
@@ -1919,7 +1935,7 @@
 <a class="card" href="https://lovable.dev/blog/introducing-growth-tools" target="_blank" rel="noopener noreferrer" style="--d:2">
   <div class="card-num">04</div>
   <div class="card-body">
-    <span class="chip">Lovable Blog</span>
+    <div class="card-meta"><span class="chip">Lovable Blog</span></div>
     <h3 class="card-title">Lovable 推出增长工具，从同一聊天窗口帮你获客投广告和做 SEO</h3>
     <p class="card-summary">Lovable 推出增长工具，在原有建应用聊天窗口中提供增长计划、广告投放和 SEO 能力。用户设定目标后，Lovable 依据应用上下文生成可执行计划；可连接 Google Ads 和 Meta 账号在 Google。</p>
   </div>
@@ -1938,7 +1954,7 @@
 <a class="card" href="https://modal.com/blog/1-billion-annualized-run-rate-series-d" target="_blank" rel="noopener noreferrer" style="--d:0">
   <div class="card-num">05</div>
   <div class="card-body">
-    <span class="chip">Modal 官方工程博客（RSS）</span>
+    <div class="card-meta"><span class="chip">Modal 官方工程博客（RSS）</span></div>
     <h3 class="card-title">Modal 年化收入突破 10 亿美元并完成 7.5 亿美元 D 轮融资</h3>
     <p class="card-summary">Modal 宣布年化收入突破 10 亿美元，并完成 7.5 亿美元 D 轮融资，投后估值 157.5 亿美元，由 Accel 领投，Kleiner Perkins 及现有投资方跟投。</p>
   </div>
@@ -1947,7 +1963,7 @@
 <a class="card" href="https://www.ithome.com/1/013/154.htm" target="_blank" rel="noopener noreferrer" style="--d:1">
   <div class="card-num">06</div>
   <div class="card-body">
-    <span class="chip">IT之家·人工智能</span>
+    <div class="card-meta"><span class="chip">IT之家·人工智能</span></div>
     <h3 class="card-title">欧盟就模型越狱事件调查 OpenAI 和 Anthropic，最高可罚全球营业额 3%</h3>
     <p class="card-summary">欧盟委员会人工智能办公室正式向 OpenAI 和 Anthropic 发出信息调取请求，调查两家公司前沿模型测试期间的模型越狱及入侵外部真实系统事件，这是《人工智能法案》实施以来对前沿实验室安全事故的首次重要执法考验。</p>
   </div>
@@ -1966,7 +1982,7 @@
 <a class="card" href="https://embracethered.com/blog/posts/2026/visual-studio-copilot-remote-code-execution/" target="_blank" rel="noopener noreferrer" style="--d:0">
   <div class="card-num">07</div>
   <div class="card-body">
-    <span class="chip">Johann Rehberger / Embrace The Red（RSS）</span>
+    <div class="card-meta"><span class="chip">Johann Rehberger / Embrace The Red（RSS）</span></div>
     <h3 class="card-title">Visual Studio Copilot 与 SSMS 远程代码执行漏洞（CVE-2026-103572）技术分析</h3>
     <p class="card-summary">Johann Rehberger 披露 Visual Studio Copilot 与 SQL Server Management Studio 中的远程代码执行漏洞 CVE-2026-103572，根因是利用文件名末尾多加一个点绕过路径校验，写入 .mcp. 或 settings.VisualStudio. 等受保护配置文件，实现任意命令执行。</p>
   </div>
@@ -1975,7 +1991,7 @@
 <a class="card" href="https://news.mit.edu/2026/researchers-improve-weather-forecasts-looking-two-six-weeks-out-1014" target="_blank" rel="noopener noreferrer" style="--d:1">
   <div class="card-num">08</div>
   <div class="card-body">
-    <span class="chip">MIT News（RSS）</span>
+    <div class="card-meta"><span class="chip">MIT News（RSS）</span></div>
     <h3 class="card-title">MIT团队用机器学习修正误差，将两到六周天气预报准确率翻倍</h3>
     <p class="card-summary">MIT研究人员团队在Nature发表论文，提出一个机器学习后处理层，通过从历史数据中学习现有预报模型的错误并修正其输出，将两周到六周范围的预报准确率翻倍。该模型在ECMWF的季节间预报竞赛中获第一名，首次在该时间范围内稳定超过气候学平均值，并显著改善洪水、寒潮等极端天气事件的预测；模型开源、低成本、可附加于任意预报模型，肯尼亚气象部门已接洽用于改进季风季预报。</p>
   </div>
@@ -1994,7 +2010,7 @@
 <a class="card" href="https://x.com/lydiahallie/status/2110484841926152622" target="_blank" rel="noopener noreferrer" style="--d:0">
   <div class="card-num">09</div>
   <div class="card-body">
-    <span class="chip">X：Lydia Hallie（Anthropic，Claude Code） (@lydiahallie)</span>
+    <div class="card-meta"><span class="chip">X：Lydia Hallie（Anthropic，Claude Code） (@lydiahallie)</span></div>
     <h3 class="card-title">Claude Code 空闲压缩从摘要继续，可用 idleCompaction 关闭并自定义阈值</h3>
     <p class="card-summary">Claude Code 的空闲压缩会让 Claude 从摘要而非完整上下文继续。作者说明可在 settings. 中设置 &quot;idleCompaction&quot;: false 关闭，并通过 CLAUDE_CODE_IDLE_COMPACT_MIN_TOKENS 自定义阈值，默认为 200k。</p>
   </div>
@@ -2003,7 +2019,7 @@
 <a class="card" href="https://www.youtube.com/shorts/nJMwXtD56mA" target="_blank" rel="noopener noreferrer" style="--d:1">
   <div class="card-num">10</div>
   <div class="card-body">
-    <span class="chip">Claude：YouTube（RSS）</span>
+    <div class="card-meta"><span class="chip">Claude：YouTube（RSS）</span></div>
     <h3 class="card-title">Claude Code 云端会话介绍，支持手机发起和并行运行</h3>
     <p class="card-summary">Claude 介绍 Claude Code 的云端会话功能，会话在云上独立虚拟机中运行，不在本地电脑上，可离开后继续、用手机发起并多个并行。文中说明如何连接 GitHub、配置环境、启动会话和查看结果，功能面向 Pro、Max、Team 套餐及带高级席位的 Enterprise 用户，与本地会话共同计入套餐限额，无单独计算费用。</p>
   </div>
@@ -2012,7 +2028,7 @@
 <a class="card" href="https://developers.openai.com/blog/maintaining-software-with-the-gpt-6-family" target="_blank" rel="noopener noreferrer" style="--d:2">
   <div class="card-num">11</div>
   <div class="card-body">
-    <span class="chip">OpenAI Developers：Blog（网页）</span>
+    <div class="card-meta"><span class="chip">OpenAI Developers：Blog（网页）</span></div>
     <h3 class="card-title">OpenAI 团队分享如何用 GPT-6 系列模型维护大型代码库</h3>
     <p class="card-summary">OpenAI Core Experimentation 团队发文介绍用 GPT-6 Astra 和 GPT-6.1 Sol 配合 Codex 做代码维护，包括清理无用代码和陈旧实验、修复 flaky 测试等。</p>
   </div>
@@ -2021,7 +2037,7 @@
 <a class="card" href="https://www.langchain.com/blog/context-engineering-deep-agents-remember" target="_blank" rel="noopener noreferrer" style="--d:3">
   <div class="card-num">12</div>
   <div class="card-body">
-    <span class="chip">LangChain：Blog（RSS）</span>
+    <div class="card-meta"><span class="chip">LangChain：Blog（RSS）</span></div>
     <h3 class="card-title">LangChain 详解 Deep Agents 的上下文工程：如何记住信息而不塞满上下文窗口</h3>
     <p class="card-summary">LangChain 发布博客，介绍其开源 Agent 框架 Deep Agents 如何用 middleware 做上下文工程，应对长任务中的 context rot。</p>
   </div>
@@ -2054,7 +2070,7 @@
         <a href="../report.html"><svg class="doc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>聚合报告</a>
         <a href="../license.html"><svg class="doc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 4-1.34 4-4V3"/><path d="M21 7h-2c-2 0 4-1.34 4-4V3"/></svg>LICENSE</a>
         <a href="../disclaimer.html"><svg class="doc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>免责声明</a>
-        <a href="https://github.com/shennanjaysn-cmyk/shennan-ai-daily" target="_blank" rel="noopener noreferrer"><svg class="doc-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.419-1.305.762-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>仓库地址</a>
+        <a href="https://github.com/shennan-pro/shennan-ai-daily" target="_blank" rel="noopener noreferrer"><svg class="doc-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.419-1.305.762-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>仓库地址</a>
         <a href="../about.html"><svg class="doc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>关于项目</a>
       </nav>
     </div>
@@ -2377,7 +2393,7 @@
     var nameEl = document.getElementById('contactName');
     var msgEl = document.getElementById('contactMsg');
     var hp = document.getElementById('contactHp');
-    var REPO = 'https://github.com/shennanjaysn-cmyk/shennan-ai-daily';
+    var REPO = 'https://github.com/shennan-pro/shennan-ai-daily';
     if (!btn || !modal) return;
     function openM() { modal.classList.add('open'); modal.setAttribute('aria-hidden', 'false'); msgEl.focus(); }
     function shutM() { modal.classList.remove('open'); modal.setAttribute('aria-hidden', 'true'); }

@@ -794,6 +794,12 @@
     border-radius: 0 8px 8px 0;
   }
   .hero-lead .lead-strong { color: var(--mist-body); }
+  /* v1.11.5：报告页版块分布条（单色明度阶梯，跟正文的克制基调一致） */
+  .dist { margin-top: 22px; }
+  .dist-bar { display: flex; height: 6px; border-radius: 3px; overflow: hidden; background: var(--line-faint); }
+  .dist-seg { height: 100%; background: var(--brand-brief); transition: opacity .2s ease; }
+  .dist-seg:hover { opacity: 1 !important; }
+  .dist-cap { margin-top: 9px; font-size: 11px; color: var(--mist-faint); letter-spacing: 0.08em; }
   .hero-tip {
     display: inline-flex;
     align-items: center;
@@ -1134,6 +1140,15 @@
 
   .card-num { font-family: var(--font-num); font-weight: 300; font-size: 32px; color: var(--gold); line-height: 1; margin-bottom: 16px; letter-spacing: -0.02em; }
   .card-body { flex: 1; display: flex; flex-direction: column; gap: 12px; }
+  /* v1.11.5：日期标签 + 来源标签同一行（仅周报/月报出现日期） */
+  .card-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .chip.chip-date {
+    color: var(--brand-brief);
+    border-color: var(--line-gold);
+    background: transparent;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.06em;
+  }
   .chip {
     display: inline-block;
     align-self: flex-start;
@@ -1779,6 +1794,7 @@
         </div>
       </div>
     </div>
+    
   </header>
 </div>
 
@@ -1814,7 +1830,9 @@
       历史日报
     </button>
     <div class="dropdown-menu" role="menu">
-      <a class="dropdown-item" href="./2026-11-08.html">2026-11-08</a>
+      <a class="dropdown-item" href="./2026-11-10.html">2026-11-10</a>
+<a class="dropdown-item" href="./2026-11-09.html">2026-11-09</a>
+<a class="dropdown-item" href="./2026-11-08.html">2026-11-08</a>
 <a class="dropdown-item" href="./2026-11-07.html">2026-11-07</a>
 <a class="dropdown-item" href="./2026-11-06.html">2026-11-06</a>
 <a class="dropdown-item" href="./2026-11-05.html">2026-11-05</a>
@@ -1841,8 +1859,6 @@
 <a class="dropdown-item" href="./2026-10-14.html">2026-10-14</a>
 <a class="dropdown-item" href="./2026-10-13.html">2026-10-13</a>
 <a class="dropdown-item" href="./2026-10-12.html">2026-10-12</a>
-<a class="dropdown-item" href="./2026-10-11.html">2026-10-11</a>
-<a class="dropdown-item" href="./2026-10-10.html">2026-10-10</a>
     </div>
   </div>
   <div class="dropdown" id="exportDropdown">
@@ -1882,7 +1898,7 @@
 <a class="card" href="https://x.com/MistralAI/status/2117562068220195097" target="_blank" rel="noopener noreferrer" style="--d:0">
   <div class="card-num">01</div>
   <div class="card-body">
-    <span class="chip">X：Mistral AI (@MistralAI)</span>
+    <div class="card-meta"><span class="chip">X：Mistral AI (@MistralAI)</span></div>
     <h3 class="card-title">Mistral Large 4 以开放权重发布并附技术报告</h3>
     <p class="card-summary">Mistral 团队成员 Pierre Stock 宣布 ML4（Mistral Large 4）正式开放权重，称其在代码智能体与网络安全方向具备前沿能力，且比三周前的 Preview 版本更高效、更紧凑。技术报告讲述其研发过程：https://huggingface.co/mistralai/Mistral-Large-4-1T-A52B/blob/main/assets/technical_report.pdf，Mistral AI 官方转发并称可在 alphaxiv 上阅读这一研发故事（https://www.alphaxiv.org/abs/2…</p>
   </div>
@@ -1901,7 +1917,7 @@
 <a class="card" href="https://ai.google.dev/gemini-api/docs/changelog#11-02-2026" target="_blank" rel="noopener noreferrer" style="--d:0">
   <div class="card-num">02</div>
   <div class="card-body">
-    <span class="chip">Gemini API：更新日志（网页）</span>
+    <div class="card-meta"><span class="chip">Gemini API：更新日志（网页）</span></div>
     <h3 class="card-title">Google AI Studio 弃用 Gemini 2.5 Pro 与 2.5 Flash，API 请求将于 12 月 1 日起自动路由</h3>
     <p class="card-summary">Gemini 2.5 Pro 与 Gemini 2.5 Flash 已弃用，无法再在 Google AI Studio 中选择。</p>
   </div>
@@ -1920,7 +1936,7 @@
 <a class="card" href="https://x.com/rohanpaul_ai/status/2117757237557088263" target="_blank" rel="noopener noreferrer" style="--d:0">
   <div class="card-num">03</div>
   <div class="card-body">
-    <span class="chip">X：Rohan Paul (@rohanpaul_ai)</span>
+    <div class="card-meta"><span class="chip">X：Rohan Paul (@rohanpaul_ai)</span></div>
     <h3 class="card-title">AMD 发布 2026 年三季度财报，预计 2027 年营收增长超 80%</h3>
     <p class="card-summary">AMD 公布 2026 年三季度财报，预计 2027 年营收增长超 80%，高于分析师建模的 77%，CEO Lisa Su 称数据中心芯片将占明年销售额的 80%。</p>
   </div>
@@ -1929,7 +1945,7 @@
 <a class="card" href="https://twitter.com/guilleflorvs/status/2117379073785696395" target="_blank" rel="noopener noreferrer" style="--d:1">
   <div class="card-num">04</div>
   <div class="card-body">
-    <span class="chip">Hacker News：AI 热帖</span>
+    <div class="card-meta"><span class="chip">Hacker News：AI 热帖</span></div>
     <h3 class="card-title">Revolut 将约 2000 名工程师迁移到自托管 GLM 编码</h3>
     <p class="card-summary">据 Revolut AI 运营负责人 David Abitbol，公司把约 2000 名工程师迁到自托管 GLM 做编码，将 Claude Code 和 Codex 列为例外。</p>
   </div>
@@ -1938,7 +1954,7 @@
 <a class="card" href="https://openai.com/index/dan-driscoll-joins-openai" target="_blank" rel="noopener noreferrer" style="--d:2">
   <div class="card-num">05</div>
   <div class="card-body">
-    <span class="chip">OpenAI：官网动态（RSS · 排除企业/客户案例）</span>
+    <div class="card-meta"><span class="chip">OpenAI：官网动态（RSS · 排除企业/客户案例）</span></div>
     <h3 class="card-title">OpenAI 任命前美国陆军部长 Dan Driscoll 为国家安全现代化高级顾问</h3>
     <p class="card-summary">OpenAI 宣布任命 Dan Driscoll 为新设的国家安全现代化高级顾问，就先进 AI 如何加强国家与网络安全提供建议，重点与美国盟友合作推动民主 AI 的负责任使用。</p>
   </div>
@@ -1957,7 +1973,7 @@
 <a class="card" href="https://alignment.openai.com/eval-production-behavior-gap/" target="_blank" rel="noopener noreferrer" style="--d:0">
   <div class="card-num">06</div>
   <div class="card-body">
-    <span class="chip">OpenAI：Alignment 研究博客（RSS）</span>
+    <div class="card-meta"><span class="chip">OpenAI：Alignment 研究博客（RSS）</span></div>
     <h3 class="card-title">OpenAI 研究：智能体安全评测与生产行为存在差距，评测目标误判是关键因素</h3>
     <p class="card-summary">OpenAI Alignment 团队对比六个模型在 Respecting Warnings 安全评测与匹配的 Codex 生产决策上的表现，发现评测成功率普遍低于生产，差距为 10.2 至 37.4 个百分点。模型普遍口头表现出评测意识（评测中一般性意识率 57.0%–83.7%），但仅告知</p>
   </div>
@@ -1966,7 +1982,7 @@
 <a class="card" href="https://openai.com/index/lifeval" target="_blank" rel="noopener noreferrer" style="--d:1">
   <div class="card-num">07</div>
   <div class="card-body">
-    <span class="chip">OpenAI：官网动态（RSS · 排除企业/客户案例）</span>
+    <div class="card-meta"><span class="chip">OpenAI：官网动态（RSS · 排除企业/客户案例）</span></div>
     <h3 class="card-title">OpenAI 推出 LifeVal 评测，衡量 AI 在日常任务上的进展</h3>
     <p class="card-summary">OpenAI 构建了 LifeVal 评测，覆盖照护、健康、教育、家庭事务、个人理财、购物和政府服务等日常任务，用于追踪模型过去一年在日常任务上的表现。该评测基于美国时间使用调查等两项大型研究，并新增 3995 名受访者的代表性调查来确定用户最需要帮助的领域。OpenAI 称最新模型在多项 LifeVal 任务上得分很高，GPT‑6 Astra 在部分任务上达到 100%。</p>
   </div>
@@ -1985,7 +2001,7 @@
 <a class="card" href="https://www.wheresyoured.at/running-dry/" target="_blank" rel="noopener noreferrer" style="--d:0">
   <div class="card-num">08</div>
   <div class="card-body">
-    <span class="chip">Ed Zitron 长文 / Where’s Your Ed At（RSS）</span>
+    <div class="card-meta"><span class="chip">Ed Zitron 长文 / Where’s Your Ed At（RSS）</span></div>
     <h3 class="card-title">Ed Zitron 解析 OpenAI 1.25 万亿美元估值融资与 Anthropic S-1/A 中的万亿级算力承诺</h3>
     <p class="card-summary">Ed Zitron 撰文认为 AI 行业资金正在枯竭。OpenAI 上周以 1.25 万亿美元估值融资 110 亿美元，低于此前计划的 300 亿美元、1.4 万亿美元估值；据 The Information，其 Q1 2026 成本收入与研发支出合计 121 亿美元，截至 3 月底持有逾 730 亿美元现金及有价证券。</p>
   </div>
@@ -1994,7 +2010,7 @@
 <a class="card" href="https://mp.weixin.qq.com/s/-LcRUPe5OYBRjiTEzYXKog" target="_blank" rel="noopener noreferrer" style="--d:1">
   <div class="card-num">09</div>
   <div class="card-body">
-    <span class="chip">公众号：数字生命卡兹克</span>
+    <div class="card-meta"><span class="chip">公众号：数字生命卡兹克</span></div>
     <h3 class="card-title">DeepSeek Harness 养鱼教程：在 QQ、微信、飞书养大肥鱼并放上 B 站抖音直播</h3>
     <p class="card-summary">数字生命卡兹克发布一篇 DeepSeek Harness 养鱼教程，讲解如何在 QQ、微信、飞书接入大肥鱼，并让它去 B 站刷视频、在抖音发视频和直播。</p>
   </div>
@@ -2003,7 +2019,7 @@
 <a class="card" href="https://www.openhands.dev/blog/post-train-ai-models-openhands-snowflake" target="_blank" rel="noopener noreferrer" style="--d:2">
   <div class="card-num">10</div>
   <div class="card-body">
-    <span class="chip">OpenHands 官方博客</span>
+    <div class="card-meta"><span class="chip">OpenHands 官方博客</span></div>
     <h3 class="card-title">OpenHands 与 Snowflake 推出基于现有 agent harness 的模型后训练方案</h3>
     <p class="card-summary">OpenHands 与 Snowflake AI Research 合作，让开发者无需在独立 RL 框架中重建 harness，即可用现有 OpenHands Agent SDK 配置和 Harbor 格式任务对开源权重模型做 RL 后训练，训练由 Snowflake Cortex Training 提供 GPU 支持。</p>
   </div>
@@ -2036,7 +2052,7 @@
         <a href="../report.html"><svg class="doc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>聚合报告</a>
         <a href="../license.html"><svg class="doc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 4-1.34 4-4V3"/><path d="M21 7h-2c-2 0 4-1.34 4-4V3"/></svg>LICENSE</a>
         <a href="../disclaimer.html"><svg class="doc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>免责声明</a>
-        <a href="https://github.com/shennanjaysn-cmyk/shennan-ai-daily" target="_blank" rel="noopener noreferrer"><svg class="doc-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.419-1.305.762-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>仓库地址</a>
+        <a href="https://github.com/shennan-pro/shennan-ai-daily" target="_blank" rel="noopener noreferrer"><svg class="doc-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.419-1.305.762-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>仓库地址</a>
         <a href="../about.html"><svg class="doc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>关于项目</a>
       </nav>
     </div>
@@ -2359,7 +2375,7 @@
     var nameEl = document.getElementById('contactName');
     var msgEl = document.getElementById('contactMsg');
     var hp = document.getElementById('contactHp');
-    var REPO = 'https://github.com/shennanjaysn-cmyk/shennan-ai-daily';
+    var REPO = 'https://github.com/shennan-pro/shennan-ai-daily';
     if (!btn || !modal) return;
     function openM() { modal.classList.add('open'); modal.setAttribute('aria-hidden', 'false'); msgEl.focus(); }
     function shutM() { modal.classList.remove('open'); modal.setAttribute('aria-hidden', 'true'); }
