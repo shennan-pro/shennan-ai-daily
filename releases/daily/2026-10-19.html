@@ -506,6 +506,12 @@
   /* fix_report_01（v1.10.7）：浅色主题下三胶囊仍用 #151C33 填实（深浅主题切换不改变右上方胶囊视觉，仅配色不同原则） */
   [data-theme="light"] .top-btn,
   [data-theme="light"] .report-morph { background: #151C33; }
+  /* v1.12.2：底色被写死成深蓝 #151C33，文字却用 var(--mist-body)。
+   * 浅色主题里该变量是深棕 #4A4540 → 深底深字，三个胶囊几乎读不出来。
+   * 浅色模式下把文字钉回浅色；hover 态另有浅底深字规则，不受影响。 */
+  [data-theme="light"] .top-btn,
+  [data-theme="light"] .report-face,
+  [data-theme="light"] .report-choice { color: #C9D0E8; }
   [data-theme="light"] .report-morph:hover { background: rgba(205, 200, 255, 0.12); border-color: var(--brand-cn); }
   [data-theme="light"] .report-choice:hover { background: rgba(131, 126, 101, 0.12); }
   [data-theme="light"] .report-divider { color: rgba(131, 126, 101, 0.35); }
@@ -1242,9 +1248,10 @@
     /* v1.11.1：报告胶囊不再"默认摊开成 周报|月报"（摊开后吃掉整行宽度，把同行其他工具挤出去），
      * 改为与 web 一致的「点一下才展开」，由 .open 类控制。 */
     /* v1.11.1 fix：.report-morph 的两个子元素都是 position:absolute，自身宽度完全靠 min-width 撑；
-     * 给 0 会塌成 0 宽（.open 后又装不下「周报 | 月报」）。展开态给足 132px。 */
-    .report-morph { min-width: 72px; }
-    .report-morph.open { min-width: 132px; }
+     * 给 0 会塌成 0 宽（.open 后又装不下「周报 | 月报」）。
+     * v1.12.2：base 统一 108px（已够容纳展开态），不再 72→132 跳变，避免触屏点开时同行工具被挤动。 */
+    .report-morph { min-width: 108px; }
+    .report-morph.open { min-width: 108px; }
     .report-morph:not(.open) .report-choices { opacity: 0; transform: translateY(12px); pointer-events: none; }
     .report-morph:not(.open) .report-face { opacity: 1; transform: translateY(0); pointer-events: auto; }
   }
@@ -1504,11 +1511,11 @@
     font-size: 12.5px;
     letter-spacing: 0.04em;
     color: var(--text-primary);
-    background: var(--surface-float);
+    background: var(--surface-modal);
     border: 1px solid var(--line-gold);
-    backdrop-filter: blur(14px) saturate(140%);
-    -webkit-backdrop-filter: blur(14px) saturate(140%);
-    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, .55);
+    box-shadow: 0 12px 34px -12px rgba(0, 0, 0, .6);
+    white-space: nowrap;
+    max-width: calc(100vw - 32px);
     opacity: 0;
     pointer-events: none;
     transition: opacity .3s ease, transform .3s cubic-bezier(.34, 1.2, .64, 1);
@@ -1694,11 +1701,39 @@
       flex-wrap: wrap;
       margin: 10px 20px 0; gap: 8px;
     }
-    .report-morph { min-width: 72px; height: 28px; }
-    .report-morph.open { min-width: 132px; }
+    /* v1.12.2：吸顶时工具组搬回 nav，若沿用上面的「第二行居中」，导航会从 60px 涨到 104px
+     * → 整页内容瞬间下跳 44px。改成 chips + 工具同一行：工具贴右，chips 用自己那层横滑容器收窄，
+     * 不会被一起卷进滚动区。上下 padding 与静止态对齐，保证吸顶前后导航高度一致。 */
+    [data-page-period] .nav.is-stuck .nav-inner {
+      display: flex; flex-wrap: nowrap; align-items: center; gap: 8px;
+      padding: 8px 12px 12px;
+    }
+    [data-page-period] .nav.is-stuck .nav-chips {
+      flex: 1 1 auto; min-width: 0;
+      padding: 2px 0 4px; scroll-padding-left: 0;
+    }
+    [data-page-period] .nav.is-stuck .nav-actions {
+      margin: 0; gap: 6px; flex-wrap: nowrap; justify-content: flex-end;
+    }
+    /* v1.12.2：静止时工具组也回到 hero 右上角（与宽屏同构），logo 回左侧。
+     * 旧规则把 .hero-top 改成 flex-end（logo 独占右上）+ .hero-sub 负 margin 上提，
+     * 于是工具组只能掉到 nav 第二行居中。现在只作用于 [data-page-period] 主页/历史页；
+     * 报告页工具组有 4 项更宽，保持原布局不动。 */
+    [data-page-period] .hero-top { justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+    [data-page-period] .hero-sub { margin-top: 0; padding-right: 0; }
+    [data-page-period] .hero-actions { margin-left: auto; }
+    [data-page-period] .hero-actions .nav-actions {
+      flex-wrap: nowrap; margin: 0; gap: 6px; justify-content: flex-end;
+    }
+    /* v1.12.2 修「胶囊内没有全显」：窄屏 base 只有 72px，而 hover 展开的
+     * 「周报 | 月报」约需 92px；只有 .open 才放宽到 132px → hover 态被 overflow:hidden 切掉左字。
+     * 统一给 108px（与桌面 base 一致），hover / .open 都不再改宽度，零位移、零裁切。 */
+    .report-morph { min-width: 108px; height: 28px; }
+    .report-morph.open { min-width: 108px; }
     .report-face { font-size: 11px; }
-    .report-choice { font-size: 10px; }
-    /* ---- hero：logo 移到右端，与「深南AI日报」同排顶对齐；整排上提 ---- */
+    .report-choice { font-size: 10px; padding: 2px 6px; }
+    .report-choices { gap: 4px; }
+    /* ---- hero：logo 位于右端（报告页保持），整排上提 ---- */
     .hero { padding: 18px 0 20px; }
     .hero-title { font-size: 34px; word-break: break-word; }
     .hero-date .big { font-size: 110px; }
@@ -1852,7 +1887,13 @@
       历史日报
     </button>
     <div class="dropdown-menu" role="menu">
-      <a class="dropdown-item" href="./2026-11-10.html">2026-11-10</a>
+      <a class="dropdown-item" href="./2026-11-16.html">2026-11-16</a>
+<a class="dropdown-item" href="./2026-11-15.html">2026-11-15</a>
+<a class="dropdown-item" href="./2026-11-14.html">2026-11-14</a>
+<a class="dropdown-item" href="./2026-11-13.html">2026-11-13</a>
+<a class="dropdown-item" href="./2026-11-12.html">2026-11-12</a>
+<a class="dropdown-item" href="./2026-11-11.html">2026-11-11</a>
+<a class="dropdown-item" href="./2026-11-10.html">2026-11-10</a>
 <a class="dropdown-item" href="./2026-11-09.html">2026-11-09</a>
 <a class="dropdown-item" href="./2026-11-08.html">2026-11-08</a>
 <a class="dropdown-item" href="./2026-11-07.html">2026-11-07</a>
@@ -1875,12 +1916,6 @@
 <a class="dropdown-item" href="./2026-10-21.html">2026-10-21</a>
 <a class="dropdown-item" href="./2026-10-20.html">2026-10-20</a>
 <a class="dropdown-item" href="./2026-10-18.html">2026-10-18</a>
-<a class="dropdown-item" href="./2026-10-17.html">2026-10-17</a>
-<a class="dropdown-item" href="./2026-10-16.html">2026-10-16</a>
-<a class="dropdown-item" href="./2026-10-15.html">2026-10-15</a>
-<a class="dropdown-item" href="./2026-10-14.html">2026-10-14</a>
-<a class="dropdown-item" href="./2026-10-13.html">2026-10-13</a>
-<a class="dropdown-item" href="./2026-10-12.html">2026-10-12</a>
     </div>
   </div>
   <div class="dropdown" id="exportDropdown">
@@ -2438,12 +2473,16 @@
     const heroActionsEl = document.getElementById('heroActions');
     const navInnerEl = document.querySelector('.nav-inner');
     const ACTIONS_DESKTOP = 880;
+    const isReportPage = !!document.body.getAttribute('data-page-report');
     function placeActions() {
       if (!actionsEl || !heroActionsEl || !navInnerEl) return;
       const stuck = navEl.classList.contains('is-stuck');
       const isDesktop = window.innerWidth > ACTIONS_DESKTOP;
-      // 桌面：静止→hero 右上角（与 logo 同排）；吸顶→搬回 nav 行内（与 5 分类合并一排）。移动端：始终留在 nav。
-      if (isDesktop && !stuck) {
+      // v1.12.2：静止时主页/历史页在窄屏也把工具组放 hero 右上角（与宽屏同构）。
+      // 报告页工具组有 4 项（周报|月报|历史日报|返回今日|导出）明显更宽，窄屏仍留在 nav，避免挤压溢出。
+      // 吸顶时所有页面一律搬回 nav 行内，保证滚动中随时可达。
+      const allowHero = isDesktop || !isReportPage;
+      if (allowHero && !stuck) {
         if (actionsEl.parentNode !== heroActionsEl) heroActionsEl.appendChild(actionsEl);
       } else {
         if (actionsEl.parentNode !== navInnerEl) navInnerEl.appendChild(actionsEl);

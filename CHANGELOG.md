@@ -12,6 +12,45 @@
 
 ---
 
+## v1.12.2_261116 — 窄屏工具组归位右上角 + 报告胶囊文字裁切修复
+
+**类型**：修订版本（布局 / 可读性缺陷修复）
+**分支**：`_fix_111`（从 `origin/main` 切出）
+
+### 一、报告胶囊「周报 | 月报」文字没全显
+
+`≤880px` 把 `.report-morph` 压到 `min-width:72px`，而展开态两个链接 + 分隔线实测需 **83px**；
+只有点击加 `.open` 才放宽到 132px —— **hover / focus-within 展开时宽度不变**，`overflow:hidden` 直接切掉左字。
+
+**修法**：窄屏 base 与 `.open` 统一 `108px`（与桌面 base 一致），展开态内容 83px 居中放得下；
+hover / open 都不再改宽度，顺带消除触屏点开时「72→132」把同行工具挤一下的位移。
+
+### 二、三个工具胶囊在窄屏归位 hero 右上角
+
+`placeActions()` 原判定 `isDesktop && !stuck` 才把工具组放进 `#heroActions`，窄屏一律落到 nav 第二行居中。
+现在：**主页/历史页**静止时窄屏也放右上角（logo 回左侧，与宽屏同构）；**报告页**工具组 4 项过宽，保持原布局。
+
+| 配套改动 | 原因 |
+|---|---|
+| `[data-page-period] .hero-top` 恢复 `space-between` + `flex-wrap` | 旧规则 `flex-end` 把 logo 独占右上，工具没位置 |
+| `.hero-sub` 去掉 `-38px` 负 margin / `padding-right:46px` | 不再需要把品牌字样上提跟 logo 对齐 |
+| 吸顶时 `nav-inner` 改 flex 单行（chips 收缩横滑 + 工具贴右） | 若不改，静止 1 行 / 吸顶 2 行会让导航 **60px→104px，整页下跳 44px** |
+| 单行吸顶规则限定 `[data-page-period]` | 报告页工具组 363px，单行会把 chips 挤到 102px |
+
+### 三、顺带修：浅色主题三胶囊「深底深字」
+
+`.top-btn` / `.report-morph` 底色写死 `#151C33`，文字却用 `var(--mist-body)`。
+浅色主题里该变量是深棕 `#4A4540` → 深蓝底 + 深棕字，几乎读不出来。
+浅色模式下把文字钉成 `#C9D0E8`（hover 态另有浅底深字规则，不受影响）。
+
+### 四、验证（headless，768 / 500 两档）
+- `.nav-actions` parent = `heroActions`；logo x=20（左），工具 x=459 / 225（右）
+- 胶囊 `clientWidth=108`，展开内容 83px → `clipped:false`
+- 导航高度静止 60px / 吸顶 60px，**delta = 0**
+- `docSW == clientW`，无横向溢出；`window.__ERR = null`
+
+---
+
 ## v1.12.1_261110 — 自动刷新改为「后台才刷、前台只提示」
 
 **类型**：修订版本（体验缺陷修复）
